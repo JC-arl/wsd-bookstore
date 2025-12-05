@@ -44,4 +44,16 @@ public class AdminUserController {
         userService.deactivateUser(id);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * 관리자용 - 유저 활성화
+     * PATCH /api/v1/admin/users/{id}/activate
+     *
+     * 응답: 204 No Content
+     */
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Void> activateUser(@PathVariable Long id) {
+        userService.activateUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
