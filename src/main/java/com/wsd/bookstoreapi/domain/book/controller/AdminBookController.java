@@ -4,19 +4,17 @@ import com.wsd.bookstoreapi.domain.book.dto.BookCreateRequest;
 import com.wsd.bookstoreapi.domain.book.dto.BookResponse;
 import com.wsd.bookstoreapi.domain.book.dto.BookUpdateRequest;
 import com.wsd.bookstoreapi.domain.book.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 관리자 전용 Book 관리 컨트롤러
- * URL prefix: /api/v1/admin/books
- *
- * SecurityConfig에서 /api/v1/admin/** 에 hasRole("ADMIN")이 걸려 있어
- * ROLE_ADMIN만 접근 가능합니다.
- */
+@Tag(name = "Admin - Books", description = "관리자용 도서 관리 API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/admin/books")
@@ -24,20 +22,27 @@ public class AdminBookController {
 
     private final BookService bookService;
 
-    /**
-     * 도서 생성
-     * POST /api/v1/admin/books
-     */
+    @Operation(summary = "도서 생성", description = "관리자가 새로운 도서를 등록합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "도서 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 데이터"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 없음")
+    })
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request) {
         BookResponse response = bookService.createBook(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /**
-     * 도서 수정
-     * PATCH /api/v1/admin/books/{id}
-     */
+    @Operation(summary = "도서 수정", description = "관리자가 도서 정보를 부분 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "도서 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 데이터"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "대상 도서를 찾을 수 없음")
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<BookResponse> updateBook(
             @PathVariable Long id,
@@ -47,10 +52,13 @@ public class AdminBookController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 도서 삭제
-     * DELETE /api/v1/admin/books/{id}
-     */
+    @Operation(summary = "도서 삭제", description = "관리자가 도서를 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "도서 삭제 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "대상 도서를 찾을 수 없음")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
