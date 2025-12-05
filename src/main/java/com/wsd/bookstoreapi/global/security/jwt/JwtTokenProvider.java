@@ -5,6 +5,7 @@ import com.wsd.bookstoreapi.global.error.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+
 @Slf4j
+@Getter
 @Component
 public class JwtTokenProvider {
 
@@ -102,6 +105,15 @@ public class JwtTokenProvider {
             log.warn("Invalid JWT: {}", e.getMessage());
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
         }
+    }
+    /**
+     * 토큰의 남은 유효시간(ms) 계산
+     */
+    public long getRemainingValidityInMs(String token) {
+        Claims claims = parseClaims(token);
+        Date expiration = claims.getExpiration();
+        long now = System.currentTimeMillis();
+        return expiration.getTime() - now;
     }
 
     private Claims parseClaims(String token) {
