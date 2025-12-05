@@ -131,14 +131,36 @@ public class AuthService {
             );
         }
 
+        // 3) Redis에 저장된 Refresh Token과 일치하는지 확인
+        String storedRefreshToken = redisAuthTokenService.getRefreshToken(userId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.UNAUTHORIZED,
+                        "로그인이 필요합니다."
+                ));
+
+        if (!storedRefreshToken.equals(refreshToken)) {
+            throw new BusinessException(
+                    ErrorCode.UNAUTHORIZED,
+                    "유효하지 않은 Refresh Token 입니다."
+            );
+        }
+
+        // 4) 새 토큰 발급
         String newAccessToken = jwtTokenProvider.generateAccessToken(userId, email, role);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(userId, email, role);
+
+        // 5) Redis에 새 Refresh Token으로 교체
+        redisAuthTokenService.saveRefreshToken(
+                userId,
+                newRefreshToken,
+                jwtTokenProvider.getRefreshTokenValidityInMs()
+        );
 
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
-                .accessTokenExpiresIn(900000L)
-                .refreshTokenExpiresIn(604800000L)
+                .accessTokenExpiresIn(jwtTokenProvider.getAccessTokenValidityInMs())
+                .refreshTokenExpiresIn(jwtTokenProvider.getRefreshTokenValidityInMs())
                 .tokenType("Bearer")
                 .build();
     }
