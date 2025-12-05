@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 @RestController
@@ -47,4 +48,16 @@ public class AuthController {
         AuthResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(response);
     }
+    /**
+     * 로그아웃
+     * POST /api/v1/auth/logout
+     * - Authorization: Bearer <accessToken> 헤더 필요
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        authService.logout(authHeader);
+        return ResponseEntity.noContent().build();
+    }
+
 }
