@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.wsd.bookstoreapi.domain.auth.service.RedisAuthTokenService;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -164,4 +165,33 @@ public class AuthService {
                 .tokenType("Bearer")
                 .build();
     }
+    /**
+     * 로그아웃
+     * - Refresh Token 삭제
+     * - Access Token 블랙리스트 등록
+     */
+    @Transactional
+    public void logout(String authHeader) {
+        if (!StringUtils.hasText(authHeader) || !authHeader.startsWith("Bearer ")) {
+            throw new BusinessException(
+                    ErrorCode.BAD_REQUEST,
+                    "Authorization 헤더가 올바르지 않습니다."
+            );
+        }
+
+        String accessToken = authHeader.substring(7);
+
+        // 유효성 검증 (만료되었으면 로그아웃 처리 의미가 거의 없음)
+        jwtTokenProvider.validateToken(accessToken);
+
+        Long userId = jwtTokenProvider.getUserId(accessToken);
+
+        // 1) Refresh Token 삭제
+        redisAuthTokenService.deleteRefreshToken(userId);
+
+        // 2) Access Token 블랙리스트 등록
+        long remaining = jwtTokenProvider.getRemainingValidityInMs(accessToken);
+        redisAuthTokenService.blacklistAccessToken(accessToken, remaining);
+    }
+
 }
