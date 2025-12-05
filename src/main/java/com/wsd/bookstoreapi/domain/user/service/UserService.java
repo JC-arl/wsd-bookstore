@@ -79,4 +79,27 @@ public class UserService {
         user.setStatus("INACTIVE");
         // JPA가 dirty checking으로 update 처리
     }
+    /**
+     * 관리자용 - 유저 활성화
+     */
+    @Transactional
+    public void activateUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND,
+                        "사용자를 찾을 수 없습니다."
+                ));
+
+        if ("ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            throw new BusinessException(
+                    ErrorCode.STATE_CONFLICT,
+                    "이미 활성 상태인 사용자입니다."
+            );
+        }
+
+        user.setStatus("ACTIVE");
+        // @Transactional + JPA dirty checking 으로 UPDATE 처리
+    }
+
 }
+
