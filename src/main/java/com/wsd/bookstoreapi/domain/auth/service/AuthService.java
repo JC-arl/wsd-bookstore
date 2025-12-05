@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.wsd.bookstoreapi.domain.auth.service.RedisAuthTokenService;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisAuthTokenService redisAuthTokenService;
 
     /**
      * 회원가입 (LOCAL)
@@ -84,13 +86,18 @@ public class AuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(userId, email, role);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId, email, role);
 
-        // 유효기간 값을 동일하게 응답으로 넘기고 싶으면 JwtTokenProvider에 getter를 추가하거나
-        // 여기서 환경변수를 다시 읽어도 됩니다. 지금은 간단히 하드코딩 가능.
+        // Redis에 Refresh Token 저장
+        redisAuthTokenService.saveRefreshToken(
+                userId,
+                refreshToken,
+                jwtTokenProvider.getRefreshTokenValidityInMs()  // @Getter 사용
+        );
+
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .accessTokenExpiresIn(900000L)      // TODO: 설정값에서 읽어도 됨
-                .refreshTokenExpiresIn(604800000L)  // TODO: 설정값에서 읽어도 됨
+                .accessTokenExpiresIn(jwtTokenProvider.getAccessTokenValidityInMs())
+                .refreshTokenExpiresIn(jwtTokenProvider.getRefreshTokenValidityInMs())
                 .tokenType("Bearer")
                 .build();
     }
