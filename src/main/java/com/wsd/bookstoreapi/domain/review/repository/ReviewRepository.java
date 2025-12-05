@@ -6,10 +6,17 @@ import com.wsd.bookstoreapi.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
+    @EntityGraph(attributePaths = {"user", "book"})
     Page<Review> findByBook(Book book, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"user", "book"})
     Page<Review> findByUser(User user, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"user", "book"})
+    Optional<Review> findById(Long id);
 }
