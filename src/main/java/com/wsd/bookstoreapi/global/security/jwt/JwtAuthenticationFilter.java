@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.wsd.bookstoreapi.domain.auth.service.RedisAuthTokenService;
 
 import java.io.IOException;
 
@@ -20,6 +21,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisAuthTokenService redisAuthTokenService;
 
     @Override
     protected void doFilterInternal(
@@ -35,7 +37,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // 토큰이 있고 아직 인증이 안 되어 있으면
+
+                // 1) 블랙리스트 체크
+                if (redisAuthTokenService.isAccessTokenBlacklisted(token)) {
+                    log.warn("블랙리스트된 토큰입니다. uri={}", requestUri);
+                    throw new BusinessException(
+                            ErrorCode.UNAUTHORIZED,
+                            "로그아웃된 토큰입니다."
+                    );
+                }
+
+                // 2) 유효성 검증
                 jwtTokenProvider.validateToken(token);
 
                 Long userId = jwtTokenProvider.getUserId(token);
@@ -60,9 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.debug("JWT 인증 성공: userId={}, role={}, uri={}", userId, role, requestUri);
             }
         } catch (Exception e) {
-            // 여기서 예외를 던지면 GlobalExceptionHandler로 전달되어 표준 에러 응답으로 변환됨
             log.warn("JWT 필터 처리 중 예외 발생: uri={}, message={}", requestUri, e.getMessage());
-            // 그냥 던지면 됨 (BusinessException이면 우리가 만든 handler가 처리)
             throw e;
         }
 
@@ -78,4 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return authHeader.substring(7);
     }
+
+
 }
