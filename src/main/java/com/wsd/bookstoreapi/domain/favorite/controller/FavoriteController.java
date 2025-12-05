@@ -5,6 +5,8 @@ import com.wsd.bookstoreapi.domain.favorite.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,9 +21,9 @@ public class FavoriteController {
      * 내 찜 목록 조회
      */
     @GetMapping
-    public ResponseEntity<List<FavoriteResponse>> getMyFavorites() {
-        List<FavoriteResponse> list = favoriteService.getMyFavorites();
-        return ResponseEntity.ok(list);
+    public ResponseEntity<Page<FavoriteResponse>> getMyFavorites(Pageable pageable) {
+        Page<FavoriteResponse> page = favoriteService.getMyFavorites(pageable);
+        return ResponseEntity.ok(page);
     }
 
     /**

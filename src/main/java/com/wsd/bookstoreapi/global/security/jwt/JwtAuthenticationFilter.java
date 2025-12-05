@@ -34,7 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String requestUri = request.getRequestURI();
         String authHeader = request.getHeader("Authorization");
-
         String token = resolveToken(authHeader);
 
         try {
@@ -42,14 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // 1) 블랙리스트 체크
                 if (redisAuthTokenService.isAccessTokenBlacklisted(token)) {
-                    log.warn("블랙리스트된 토큰입니다. uri={}", requestUri);
-                    throw new BusinessException(
-                            ErrorCode.UNAUTHORIZED,
-                            "로그아웃된 토큰입니다."
-                    );
+                    writeUnauthorizedError(response, requestUri,
+                            "로그아웃된 토큰입니다.");
+                    return; // 더 이상 체인 진행 X
                 }
 
-                // 2) 유효성 검증
+                // 2) 토큰 유효성 검증
                 jwtTokenProvider.validateToken(token);
 
                 Long userId = jwtTokenProvider.getUserId(token);
@@ -70,15 +67,51 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                log.debug("JWT 인증 성공: userId={}, role={}, uri={}", userId, role, requestUri);
             }
-        } catch (Exception e) {
-            log.warn("JWT 필터 처리 중 예외 발생: uri={}, message={}", requestUri, e.getMessage());
-            throw e;
-        }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+
+        } catch (BusinessException ex) {
+            // JWT 관련 BusinessException도 여기서 동일 포맷으로 응답
+            int status = ex.getErrorCode().getHttpStatus().value();
+            writeErrorResponse(response, requestUri, status, ex.getErrorCode().name(), ex.getMessage());
+        } catch (Exception ex) {
+            writeErrorResponse(response, requestUri, 401, "UNAUTHORIZED", "유효하지 않은 토큰입니다.");
+        }
+    }
+    private void writeUnauthorizedError(HttpServletResponse response,
+                                        String path,
+                                        String message) throws IOException {
+        writeErrorResponse(response, path, 401, "UNAUTHORIZED", message);
+    }
+
+    private void writeErrorResponse(HttpServletResponse response,
+                                    String path,
+                                    int status,
+                                    String code,
+                                    String message) throws IOException {
+
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+
+        String body = """
+            {
+              "timestamp": "%s",
+              "path": "%s",
+              "status": %d,
+              "code": "%s",
+              "message": "%s",
+              "details": {}
+            }
+            """.formatted(
+                java.time.OffsetDateTime.now(),
+                path,
+                status,
+                code,
+                message.replace("\"", "\\\"")
+        );
+
+        response.getWriter().write(body);
     }
 
     private String resolveToken(String authHeader) {

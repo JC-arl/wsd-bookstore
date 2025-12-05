@@ -13,7 +13,8 @@ import com.wsd.bookstoreapi.global.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -32,12 +33,10 @@ public class FavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public List<FavoriteResponse> getMyFavorites() {
+    public Page<FavoriteResponse> getMyFavorites(Pageable pageable) {
         User user = getCurrentUser();
-        List<Favorite> favorites = favoriteRepository.findByUser(user);
-        return favorites.stream()
-                .map(FavoriteResponse::from)
-                .toList();
+        return favoriteRepository.findByUser(user, pageable)
+                .map(FavoriteResponse::from);
     }
 
     @Transactional
