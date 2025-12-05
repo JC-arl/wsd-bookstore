@@ -24,20 +24,23 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers(
-                                        "/health",
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**",
-                                        "/api/v1/auth/**",   // 로그인/회원가입 등은 열어 둘 예정
-                                        "/api/v1/test/**"    // 테스트용은 편하게
-                                ).permitAll()
-                                // 이번 단계에서는 아직 전체 인증을 강제하지는 않음
-                                .anyRequest().permitAll()
-                        // 다음 단계에서: .anyRequest().authenticated()
+                        // 헬스체크, 문서, 인증용 엔드포인트는 항상 허용
+                        .requestMatchers(
+                                "/health",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/api/v1/auth/**"
+                        ).permitAll()
+
+                        // 관리자 전용 API
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 그 외 모든 API는 인증 필요
+                        .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
 
-        // 여기서 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
+        // JWT 필터 연결
         http.addFilterBefore(
                 new JwtAuthenticationFilter(jwtTokenProvider),
                 UsernamePasswordAuthenticationFilter.class
@@ -48,7 +51,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // 로그인 시 비밀번호 해시에 사용할 예정
         return new BCryptPasswordEncoder();
     }
 }
