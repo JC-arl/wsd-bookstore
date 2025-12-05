@@ -44,7 +44,7 @@ public class SecurityConfig {
 
         // JWT 필터 연결
         http.addFilterBefore(
-                new JwtAuthenticationFilter(jwtTokenProvider),
+                new JwtAuthenticationFilter(jwtTokenProvider, redisAuthTokenService),
                 UsernamePasswordAuthenticationFilter.class
         );
 
