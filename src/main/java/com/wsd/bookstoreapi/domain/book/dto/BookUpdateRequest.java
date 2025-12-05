@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class BookUpdateRequest {
-
+//부분 수정(PATCH) 용이므로, 필수값은 없고 모두 nullable로 둡니다.
     @Size(max = 255, message = "제목은 최대 255자까지 가능합니다.")
     private String title;
 
