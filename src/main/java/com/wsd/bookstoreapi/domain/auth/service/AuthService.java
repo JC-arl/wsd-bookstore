@@ -40,7 +40,7 @@ public class AuthService {
         User user = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(passwordEncoder.encode(request.getPassword()))    //비밀번호 해싱(bcrypt)
                 .role(UserRole.ROLE_USER)
                 .provider(AuthProvider.LOCAL)
                 .providerId(null)
