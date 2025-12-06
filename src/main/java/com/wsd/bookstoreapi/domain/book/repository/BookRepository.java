@@ -16,15 +16,16 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      * 둘 중 하나 혹은 둘 다 null이면 해당 조건은 무시
      */
     @Query("""
-           SELECT b
-           FROM Book b
-           WHERE (:keyword IS NULL
-                  OR LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                  OR LOWER(b.author) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                  OR LOWER(b.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
-             AND (:category IS NULL OR b.category = :category)
-           """)
+    SELECT b
+    FROM Book b
+    WHERE (:keyword IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
+      AND (:category IS NULL OR b.category = :category)
+""")
+
     Page<Book> searchBooks(
+//            @Param("keyword") String keyword,
+//            @Param("category") String category,
+            String keyword,
             String title,
             String category,
             Pageable pageable

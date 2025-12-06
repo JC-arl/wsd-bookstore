@@ -1,4 +1,3 @@
-// CartItem.java
 package com.wsd.bookstoreapi.domain.cart.entity;
 
 import com.wsd.bookstoreapi.domain.book.entity.Book;
@@ -12,21 +11,19 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "cart_items",
-        indexes = {
-                @Index(name = "idx_cart_items_cart_id", columnList = "cart_id"),
-                @Index(name = "idx_cart_items_book_id", columnList = "book_id")
-        })
+@Table(name = "cart_items")
 public class CartItem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Cart와 N:1
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
+    // Book와 N:1
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;

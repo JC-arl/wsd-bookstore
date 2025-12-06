@@ -33,9 +33,10 @@ public class BookController {
     public ResponseEntity<ApiResult<Page<BookResponse>>> getBooks(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String title,
             Pageable pageable
     ) {
-        Page<BookResponse> page = bookService.getBooks(keyword, category, pageable);
+        Page<BookResponse> page = bookService.getBooks(keyword, category, title, pageable);
 
         ApiResult<Page<BookResponse>> apiResult = ApiResult.success(
                 page,

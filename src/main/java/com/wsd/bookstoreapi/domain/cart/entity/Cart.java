@@ -1,4 +1,3 @@
-// Cart.java
 package com.wsd.bookstoreapi.domain.cart.entity;
 
 import com.wsd.bookstoreapi.domain.user.entity.User;
@@ -22,12 +21,12 @@ public class Cart extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 1:1 사용자
+    // 소유자
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    // 장바구니 항목
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     private List<CartItem> items = new ArrayList<>();
 }

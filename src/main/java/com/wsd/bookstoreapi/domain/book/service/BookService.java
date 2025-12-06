@@ -59,7 +59,7 @@ public class BookService {
      * 목록 조회 (검색/페이지네이션/정렬)
      */
     @Transactional(readOnly = true)
-    public Page<BookResponse> searchBooks(String keyword, String category, Pageable pageable) {
+    public Page<BookResponse> searchBooks(String keyword, String category,String title, Pageable pageable) {
         // 빈 문자열은 null로 처리해서 조건 제거
         if (keyword != null && keyword.isBlank()) {
             keyword = null;
@@ -68,7 +68,7 @@ public class BookService {
             category = null;
         }
 
-        return bookRepository.searchBooks(keyword, category, pageable)
+        return bookRepository.searchBooks(keyword, category, title, pageable)
                 .map(BookResponse::from);
     }
 
@@ -132,7 +132,7 @@ public class BookService {
     /**
      * 키워드/카테고리 기준 도서 검색 + 페이지네이션
      */
-    public Page<BookResponse> getBooks(String keyword, String category, Pageable pageable) {
+    public Page<BookResponse> getBooks(String keyword, String category, String title, Pageable pageable) {
 
         String keywordFilter = (keyword == null || keyword.isBlank()) ? "" : keyword;
         String categoryFilter = (category == null || category.isBlank()) ? "" : category;
@@ -141,6 +141,7 @@ public class BookService {
                 .searchBooks(
                         keywordFilter,
                         categoryFilter,
+                        title,
                         pageable
                 );
 
