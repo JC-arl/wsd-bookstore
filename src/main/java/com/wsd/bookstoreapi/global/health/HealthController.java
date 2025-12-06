@@ -1,29 +1,37 @@
 package com.wsd.bookstoreapi.global.health;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.wsd.bookstoreapi.global.api.ApiResult;
+import com.wsd.bookstoreapi.global.health.dto.HealthResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
-
+@Tag(name = "Health", description = "헬스체크 API")
 @RestController
+@RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class HealthController {
 
-    // application.properties에서 가져오기
-    @Value("${spring.application.name:bookstore-api}")
-    private String applicationName;
+    private final HealthService healthService;
 
-    // 버전은 나중에 build 설정에서 주입하거나, 일단 하드코딩해도 됨
-    @Value("${app.version:0.0.1-SNAPSHOT}")
-    private String version;
-
+    @Operation(
+            summary = "헬스체크",
+            description = "인증 없이 호출 가능. 애플리케이션/DB/Redis 상태를 반환합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "서비스 정상 동작 중")
+    })
     @GetMapping("/health")
-    public HealthResponse health() {
-        return HealthResponse.builder()
-                .status("UP")
-                .application(applicationName)
-                .version(version)
-                .timestamp(OffsetDateTime.now())
-                .build();
+    public ResponseEntity<ApiResult<HealthResponse>> health() {
+        HealthResponse health = healthService.getHealth();
+        ApiResult<HealthResponse> apiResult = ApiResult.success(
+                health,
+                "OK"
+        );
+        return ResponseEntity.ok(apiResult);
     }
 }
