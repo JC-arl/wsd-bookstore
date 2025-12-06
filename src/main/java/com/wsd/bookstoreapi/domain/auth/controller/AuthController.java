@@ -5,12 +5,13 @@ import com.wsd.bookstoreapi.domain.auth.dto.LoginRequest;
 import com.wsd.bookstoreapi.domain.auth.dto.RefreshTokenRequest;
 import com.wsd.bookstoreapi.domain.auth.dto.SignUpRequest;
 import com.wsd.bookstoreapi.domain.auth.service.AuthService;
+import com.wsd.bookstoreapi.global.api.ApiResult;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,11 +30,20 @@ public class AuthController {
      * 회원가입
      * POST /api/v1/auth/signup
      */
+    @Operation(summary = "회원가입", description = "새로운 사용자 계정을 생성합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원가입 성공"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 데이터"),
+            @ApiResponse(responseCode = "409", description = "중복된 이메일"),
+            @ApiResponse(responseCode = "422", description = "요청 형식 오류")
+    })
     @PostMapping("/signup")
-    public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest request) {
+    public ResponseEntity<ApiResult<Void>> signUp(@Valid @RequestBody SignUpRequest request) {
         authService.signUp(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        ApiResult<Void> apiResult = ApiResult.successMessage("회원가입이 완료되었습니다.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResult);
     }
+
 
     /**
      * 로그인 (JWT 발급)
@@ -46,9 +56,15 @@ public class AuthController {
             @ApiResponse(responseCode = "422", description = "요청 형식 오류")
     })
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResult<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse authResponse = authService.login(request);
+
+        ApiResult<AuthResponse> apiResult = ApiResult.success(
+                authResponse,
+                "로그인에 성공했습니다."
+        );
+
+        return ResponseEntity.ok(apiResult);
     }
 
     /**
@@ -62,10 +78,19 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "비활성화된 계정"),
     })
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        AuthResponse response = authService.refreshToken(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResult<AuthResponse>> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        AuthResponse authResponse = authService.refreshToken(request);
+
+        ApiResult<AuthResponse> apiResult = ApiResult.success(
+                authResponse,
+                "토큰이 성공적으로 재발급되었습니다."
+        );
+
+        return ResponseEntity.ok(apiResult);
     }
+
     /**
      * 로그아웃
      * POST /api/v1/auth/logout
@@ -73,14 +98,17 @@ public class AuthController {
      */
     @Operation(summary = "로그아웃", description = "현재 Access Token을 블랙리스트에 등록하고 Refresh Token을 삭제합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
             @ApiResponse(responseCode = "400", description = "Authorization 헤더 형식 오류")
     })
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
+    public ResponseEntity<ApiResult<Void>> logout(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         authService.logout(authHeader);
-        return ResponseEntity.noContent().build();
+
+        ApiResult<Void> apiResult = ApiResult.successMessage("로그아웃 되었습니다.");
+
+        return ResponseEntity.ok(apiResult);
     }
 
 }

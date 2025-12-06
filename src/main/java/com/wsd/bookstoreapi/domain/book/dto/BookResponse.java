@@ -1,6 +1,7 @@
 package com.wsd.bookstoreapi.domain.book.dto;
 
 import com.wsd.bookstoreapi.domain.book.entity.Book;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,19 +13,38 @@ import java.time.LocalDateTime;
 @Builder
 public class BookResponse {
 
-    private final Long id;
-    private final String title;
-    private final String author;
-    private final String publisher;
-    private final String isbn;
-    private final String category;
-    private final BigDecimal price;
-    private final Integer stockQuantity;
-    private final String description;
-    private final LocalDate publishedAt;
-    private final boolean active;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    @Schema(description = "도서 ID", example = "10")
+    private Long id;
+
+    @Schema(description = "도서 제목", example = "이펙티브 자바")
+    private String title;
+
+    @Schema(description = "저자명", example = "조슈아 블로크")
+    private String author;
+
+    @Schema(description = "출판사", example = "인사이트")
+    private String publisher;
+
+    @Schema(description = "ISBN 번호", example = "9788966262281")
+    private String isbn;
+
+    @Schema(description = "카테고리", example = "PROGRAMMING")
+    private String category;
+
+    @Schema(description = "가격(원)", example = "30000")
+    private BigDecimal price;
+
+    @Schema(description = "도서 요약", example = "자바 개발자라면 반드시 읽어야 할 필독서")
+    private String summary; // or description
+
+    @Schema(description = "출간일", example = "2025-12-06")
+    private LocalDate publicationDate;
+
+    @Schema(description = "생성 시각", example = "2025-12-06T03:00:00")
+    private LocalDateTime createdAt;
+
+    @Schema(description = "수정 시각", example = "2025-12-06T03:10:00")
+    private LocalDateTime updatedAt;
 
     public static BookResponse from(Book book) {
         return BookResponse.builder()
@@ -35,10 +55,6 @@ public class BookResponse {
                 .isbn(book.getIsbn())
                 .category(book.getCategory())
                 .price(book.getPrice())
-                .stockQuantity(book.getStockQuantity())
-                .description(book.getDescription())
-                .publishedAt(book.getPublishedAt())
-                .active(book.isActive())
                 .createdAt(book.getCreatedAt())
                 .updatedAt(book.getUpdatedAt())
                 .build();

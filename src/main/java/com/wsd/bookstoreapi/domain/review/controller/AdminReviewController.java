@@ -2,6 +2,7 @@ package com.wsd.bookstoreapi.domain.review.controller;
 
 import com.wsd.bookstoreapi.domain.review.dto.ReviewResponse;
 import com.wsd.bookstoreapi.domain.review.service.ReviewService;
+import com.wsd.bookstoreapi.global.api.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,21 +28,26 @@ public class AdminReviewController {
             @ApiResponse(responseCode = "403", description = "관리자 권한 없음")
     })
     @GetMapping
-    public ResponseEntity<Page<ReviewResponse>> getReviews(Pageable pageable) {
+    public ResponseEntity<ApiResult<Page<ReviewResponse>>> getReviews(Pageable pageable) {
         Page<ReviewResponse> page = reviewService.getReviewsForAdmin(pageable);
-        return ResponseEntity.ok(page);
+        ApiResult<Page<ReviewResponse>> apiResult = ApiResult.success(
+                page,
+                "리뷰 목록 조회 성공"
+        );
+        return ResponseEntity.ok(apiResult);
     }
 
     @Operation(summary = "리뷰 삭제", description = "관리자가 특정 리뷰를 삭제합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "삭제 성공"),
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "403", description = "관리자 권한 없음"),
             @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+    public ResponseEntity<ApiResult<Void>> deleteReview(@PathVariable Long id) {
         reviewService.deleteReviewForAdmin(id);
-        return ResponseEntity.noContent().build();
+        ApiResult<Void> apiResult = ApiResult.successMessage("리뷰가 성공적으로 삭제되었습니다.");
+        return ResponseEntity.ok(apiResult);
     }
 }

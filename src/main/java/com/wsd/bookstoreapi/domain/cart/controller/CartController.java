@@ -3,6 +3,7 @@ package com.wsd.bookstoreapi.domain.cart.controller;
 import com.wsd.bookstoreapi.domain.cart.dto.CartItemRequest;
 import com.wsd.bookstoreapi.domain.cart.dto.CartResponse;
 import com.wsd.bookstoreapi.domain.cart.service.CartService;
+import com.wsd.bookstoreapi.global.api.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,9 +28,13 @@ public class CartController {
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
     @GetMapping
-    public ResponseEntity<CartResponse> getMyCart() {
-        CartResponse response = cartService.getMyCart();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResult<CartResponse>> getMyCart() {
+        CartResponse cartResponse = cartService.getMyCart();
+        ApiResult<CartResponse> apiResult = ApiResult.success(
+                cartResponse,
+                "장바구니 조회 성공"
+        );
+        return ResponseEntity.ok(apiResult);
     }
 
     @Operation(summary = "장바구니 항목 추가", description = "도서를 장바구니에 추가합니다.")
@@ -40,9 +45,15 @@ public class CartController {
             @ApiResponse(responseCode = "404", description = "도서를 찾을 수 없음")
     })
     @PostMapping("/items")
-    public ResponseEntity<CartResponse> addItem(@Valid @RequestBody CartItemRequest request) {
-        CartResponse response = cartService.addItemToCart(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResult<CartResponse>> addItem(
+            @Valid @RequestBody CartItemRequest request
+    ) {
+        CartResponse cartResponse = cartService.addItemToCart(request);
+        ApiResult<CartResponse> apiResult = ApiResult.success(
+                cartResponse,
+                "장바구니에 항목이 추가되었습니다."
+        );
+        return ResponseEntity.ok(apiResult);
     }
 
     @Operation(summary = "장바구니 항목 수량 변경", description = "특정 장바구니 항목의 수량을 변경합니다.")
@@ -53,12 +64,16 @@ public class CartController {
             @ApiResponse(responseCode = "404", description = "장바구니 항목을 찾을 수 없음")
     })
     @PatchMapping("/items/{itemId}")
-    public ResponseEntity<CartResponse> updateItem(
+    public ResponseEntity<ApiResult<CartResponse>> updateItem(
             @PathVariable Long itemId,
             @RequestParam @Min(1) Integer quantity
     ) {
-        CartResponse response = cartService.updateCartItem(itemId, quantity);
-        return ResponseEntity.ok(response);
+        CartResponse cartResponse = cartService.updateCartItem(itemId, quantity);
+        ApiResult<CartResponse> apiResult = ApiResult.success(
+                cartResponse,
+                "장바구니 항목 수량이 변경되었습니다."
+        );
+        return ResponseEntity.ok(apiResult);
     }
 
     @Operation(summary = "장바구니 항목 삭제", description = "특정 장바구니 항목을 삭제합니다.")
@@ -68,19 +83,24 @@ public class CartController {
             @ApiResponse(responseCode = "404", description = "장바구니 항목을 찾을 수 없음")
     })
     @DeleteMapping("/items/{itemId}")
-    public ResponseEntity<CartResponse> removeItem(@PathVariable Long itemId) {
-        CartResponse response = cartService.removeCartItem(itemId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResult<CartResponse>> removeItem(@PathVariable Long itemId) {
+        CartResponse cartResponse = cartService.removeCartItem(itemId);
+        ApiResult<CartResponse> apiResult = ApiResult.success(
+                cartResponse,
+                "장바구니 항목이 삭제되었습니다."
+        );
+        return ResponseEntity.ok(apiResult);
     }
 
     @Operation(summary = "장바구니 비우기", description = "장바구니의 모든 항목을 삭제합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "비우기 성공"),
+            @ApiResponse(responseCode = "200", description = "비우기 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
     @DeleteMapping
-    public ResponseEntity<Void> clearCart() {
+    public ResponseEntity<ApiResult<Void>> clearCart() {
         cartService.clearCart();
-        return ResponseEntity.noContent().build();
+        ApiResult<Void> apiResult = ApiResult.successMessage("장바구니가 비워졌습니다.");
+        return ResponseEntity.ok(apiResult);
     }
 }

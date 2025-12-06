@@ -97,8 +97,6 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .accessTokenExpiresIn(jwtTokenProvider.getAccessTokenValidityInMs())
-                .refreshTokenExpiresIn(jwtTokenProvider.getRefreshTokenValidityInMs())
                 .tokenType("Bearer")
                 .build();
     }
@@ -187,8 +185,6 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
-                .accessTokenExpiresIn(jwtTokenProvider.getAccessTokenValidityInMs())
-                .refreshTokenExpiresIn(jwtTokenProvider.getRefreshTokenValidityInMs())
                 .tokenType("Bearer")
                 .build();
     }

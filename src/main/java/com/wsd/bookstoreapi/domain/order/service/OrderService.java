@@ -54,7 +54,7 @@ public class OrderService {
         Order order = Order.builder()
                 .user(user)
                 .status(OrderStatus.PENDING)
-                .shippingAddress(request.getShippingAddress())
+                .shippingAddress(request.getAddress())
                 .totalAmount(BigDecimal.ZERO)
                 .build();
 

@@ -25,8 +25,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
              AND (:category IS NULL OR b.category = :category)
            """)
     Page<Book> searchBooks(
-            @Param("keyword") String keyword,
-            @Param("category") String category,
+            String title,
+            String category,
             Pageable pageable
     );
 }

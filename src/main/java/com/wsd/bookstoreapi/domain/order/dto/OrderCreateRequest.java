@@ -1,5 +1,6 @@
 package com.wsd.bookstoreapi.domain.order.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,8 +9,15 @@ import lombok.Setter;
 @Setter
 public class OrderCreateRequest {
 
-    @NotBlank(message = "배송지는 필수입니다.")
-    private String shippingAddress;
+    @Schema(description = "수령인 이름", example = "홍길동")
+    @NotBlank
+    private String receiverName;
 
-    // 장바구니 기반으로 주문 생성할 것이므로 개별 아이템 리스트는 별도로 받지 않음
+    @Schema(description = "배송 주소", example = "서울특별시 강남구 테헤란로 123 101동 101호")
+    @NotBlank
+    private String address;
+
+    @Schema(description = "요청 사항", example = "부재 시 경비실에 맡겨 주세요.")
+    private String memo;
+
 }

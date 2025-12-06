@@ -129,4 +129,21 @@ public class BookService {
 
         bookRepository.delete(book);
     }
+    /**
+     * 키워드/카테고리 기준 도서 검색 + 페이지네이션
+     */
+    public Page<BookResponse> getBooks(String keyword, String category, Pageable pageable) {
+
+        String keywordFilter = (keyword == null || keyword.isBlank()) ? "" : keyword;
+        String categoryFilter = (category == null || category.isBlank()) ? "" : category;
+
+        Page<Book> books = bookRepository
+                .searchBooks(
+                        keywordFilter,
+                        categoryFilter,
+                        pageable
+                );
+
+        return books.map(BookResponse::from);
+    }
 }

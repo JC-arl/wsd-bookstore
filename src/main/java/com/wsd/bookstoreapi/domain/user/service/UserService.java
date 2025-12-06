@@ -12,6 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.wsd.bookstoreapi.domain.user.dto.UserMeResponse;
+import com.wsd.bookstoreapi.domain.user.dto.UserUpdateRequest;
+import com.wsd.bookstoreapi.global.security.SecurityUtil;
+import com.wsd.bookstoreapi.global.error.BusinessException;
+import com.wsd.bookstoreapi.global.error.ErrorCode;
+
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +25,42 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private User getCurrentUser() {
+        Long userId = SecurityUtil.getCurrentUserId();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND,
+                        "사용자를 찾을 수 없습니다."
+                ));
+    }
+
+    @Transactional(readOnly = true)
+    public UserMeResponse getMyInfo() {
+        User user = getCurrentUser();
+        return UserMeResponse.from(user);
+    }
+
+    @Transactional
+    public UserMeResponse updateMyInfo(UserUpdateRequest request) {
+        User user = getCurrentUser();
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        // 다른 필드도 필요시 업데이트
+        return UserMeResponse.from(user);
+    }
+
+    @Transactional
+    public void deactivateMe() {
+        User user = getCurrentUser();
+        user.setStatus("INACTIVE");
+    }
+
+    @Transactional
+    public void deleteMe() {
+        User user = getCurrentUser();
+        userRepository.delete(user);
+    }
     /**
      * 내 정보 조회
      */
