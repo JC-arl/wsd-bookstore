@@ -9,7 +9,5 @@ public class AuthResponse {
 
     private final String accessToken;
     private final String refreshToken;
-    private final long accessTokenExpiresIn;   // ms 단위
-    private final long refreshTokenExpiresIn;  // ms 단위
     private final String tokenType;            // "Bearer"
 }

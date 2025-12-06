@@ -19,6 +19,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
     /**
      * 비즈니스 예외 (도메인 에러)
      */
@@ -186,22 +187,24 @@ public class GlobalExceptionHandler {
      * 최종 fallback - 여기까지 오면 알 수 없는 에러
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(
-            Exception ex,
-            HttpServletRequest request
-    ) {
-        String path = request.getRequestURI();
+    public ResponseEntity<ErrorResponse> handleException(Exception ex, HttpServletRequest request) {
+        // 스택 트레이스는 로그로 남기고
+        log.error("Unhandled exception at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
-        // 서버 로그에는 full stack trace 출력
-        log.error("Unhandled exception at path={}", path, ex);
+        // 디버깅 편하게: 실제 예외 메시지를 details에 넣어줌
+        Map<String, Object> details = new HashMap<>();
+        details.put("exception", ex.getClass().getName());
+        details.put("message", ex.getMessage());
 
-        ErrorResponse body = ErrorResponse.of(
-                path,
-                ErrorCode.UNKNOWN_ERROR
+        ErrorResponse response = ErrorResponse.of(
+                request.getRequestURI(),
+                ErrorCode.UNKNOWN_ERROR,
+                details
         );
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(body);
+                .body(response);
     }
+
 }
