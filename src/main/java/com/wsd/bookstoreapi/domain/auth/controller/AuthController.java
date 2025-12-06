@@ -26,10 +26,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * 회원가입
-     * POST /api/v1/auth/signup
-     */
     @Operation(summary = "회원가입", description = "새로운 사용자 계정을 생성합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "회원가입 성공"),
@@ -44,11 +40,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResult);
     }
 
-
-    /**
-     * 로그인 (JWT 발급)
-     * POST /api/v1/auth/login
-     */
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 Access/Refresh Token을 발급합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공"),
@@ -63,14 +54,9 @@ public class AuthController {
                 authResponse,
                 "로그인에 성공했습니다."
         );
-
         return ResponseEntity.ok(apiResult);
     }
 
-    /**
-     * Refresh Token으로 Access Token 재발급
-     * POST /api/v1/auth/refresh
-     */
     @Operation(summary = "토큰 재발급", description = "유효한 Refresh Token으로 Access/Refresh Token을 재발급합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "재발급 성공"),
@@ -87,15 +73,9 @@ public class AuthController {
                 authResponse,
                 "토큰이 성공적으로 재발급되었습니다."
         );
-
         return ResponseEntity.ok(apiResult);
     }
 
-    /**
-     * 로그아웃
-     * POST /api/v1/auth/logout
-     * - Authorization: Bearer <accessToken> 헤더 필요
-     */
     @Operation(summary = "로그아웃", description = "현재 Access Token을 블랙리스트에 등록하고 Refresh Token을 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
@@ -107,8 +87,6 @@ public class AuthController {
         authService.logout(authHeader);
 
         ApiResult<Void> apiResult = ApiResult.successMessage("로그아웃 되었습니다.");
-
         return ResponseEntity.ok(apiResult);
     }
-
 }

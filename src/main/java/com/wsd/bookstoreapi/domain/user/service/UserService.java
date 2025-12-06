@@ -2,6 +2,7 @@ package com.wsd.bookstoreapi.domain.user.service;
 
 import com.wsd.bookstoreapi.domain.user.dto.AdminUserResponse;
 import com.wsd.bookstoreapi.domain.user.dto.UserMeResponse;
+import com.wsd.bookstoreapi.domain.user.dto.UserUpdateRequest;
 import com.wsd.bookstoreapi.domain.user.entity.User;
 import com.wsd.bookstoreapi.domain.user.repository.UserRepository;
 import com.wsd.bookstoreapi.global.error.BusinessException;
@@ -12,12 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.wsd.bookstoreapi.domain.user.dto.UserMeResponse;
-import com.wsd.bookstoreapi.domain.user.dto.UserUpdateRequest;
-import com.wsd.bookstoreapi.global.security.SecurityUtil;
-import com.wsd.bookstoreapi.global.error.BusinessException;
-import com.wsd.bookstoreapi.global.error.ErrorCode;
-
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +20,9 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * 현재 로그인한 사용자 엔티티 조회
+     */
     private User getCurrentUser() {
         Long userId = SecurityUtil.getCurrentUserId();
         return userRepository.findById(userId)
@@ -34,47 +32,44 @@ public class UserService {
                 ));
     }
 
+    /**
+     * 내 정보 조회
+     */
     @Transactional(readOnly = true)
     public UserMeResponse getMyInfo() {
         User user = getCurrentUser();
         return UserMeResponse.from(user);
     }
 
+    /**
+     * 내 정보 수정
+     */
     @Transactional
     public UserMeResponse updateMyInfo(UserUpdateRequest request) {
         User user = getCurrentUser();
-        if (request.getName() != null) {
+        if (request.getName() != null && !request.getName().isBlank()) {
             user.setName(request.getName());
         }
-        // 다른 필드도 필요시 업데이트
+        // 필요 시 다른 필드도 업데이트
         return UserMeResponse.from(user);
     }
 
+    /**
+     * 내 계정 비활성화(소프트 삭제)
+     */
     @Transactional
     public void deactivateMe() {
         User user = getCurrentUser();
-        user.setStatus("INACTIVE");
+        user.setStatus("INACTIVE"); // enum이면 UserStatus.INACTIVE 등으로 변경
     }
 
+    /**
+     * 내 계정 영구 삭제(하드 삭제)
+     */
     @Transactional
     public void deleteMe() {
         User user = getCurrentUser();
         userRepository.delete(user);
-    }
-    /**
-     * 내 정보 조회
-     */
-    @Transactional(readOnly = true)
-    public UserMeResponse getMyProfile() {
-        Long currentUserId = SecurityUtil.getCurrentUserId();
-
-        User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.USER_NOT_FOUND,
-                        "사용자를 찾을 수 없습니다."
-                ));
-
-        return UserMeResponse.from(user);
     }
 
     /**
@@ -90,7 +85,7 @@ public class UserService {
      * 관리자용 - 특정 유저 상세 조회
      */
     @Transactional(readOnly = true)
-    public AdminUserResponse getUserByIdForAdmin(Long userId) {
+    public AdminUserResponse getUserForAdmin(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.USER_NOT_FOUND,
@@ -119,8 +114,8 @@ public class UserService {
         }
 
         user.setStatus("INACTIVE");
-        // JPA가 dirty checking으로 update 처리
     }
+
     /**
      * 관리자용 - 유저 활성화
      */
@@ -140,8 +135,5 @@ public class UserService {
         }
 
         user.setStatus("ACTIVE");
-        // @Transactional + JPA dirty checking 으로 UPDATE 처리
     }
-
 }
-

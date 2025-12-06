@@ -1,5 +1,6 @@
 package com.wsd.bookstoreapi.global.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.Getter;
 @Builder
 public class ApiResult<T> {
 
+    @JsonProperty("isSuccess")
     @Schema(description = "요청 성공 여부", example = "true")
     private final boolean isSuccess;
 
