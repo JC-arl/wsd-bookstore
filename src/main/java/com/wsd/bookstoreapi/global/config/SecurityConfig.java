@@ -48,11 +48,6 @@ public class SecurityConfig {
 
                         // 관리자 전용 API
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        // 내 정보 조회는 "인증만" 필요
-                        .requestMatchers(
-                                "/api/v1/users/me",
-                                "/api/v1/users/me/**"
-                        ).authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/books/**").permitAll()
                         // 그 외 모든 API는 인증 필요
                         .anyRequest().authenticated()
@@ -60,10 +55,7 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults());
 
         // JWT 필터 연결
-        http.addFilterBefore(
-                new JwtAuthenticationFilter(jwtTokenProvider, redisAuthTokenService),
-                UsernamePasswordAuthenticationFilter.class
-        );
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -167,19 +167,35 @@ class AdminBookControllerTest extends IntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("관리자 - 비활성 도서를 다시 활성화")
+    @DisplayName("관리자 - 비활성화된 도서 재활성화 성공")
     void activateBook_success() throws Exception {
-        // 비활성 상태로 저장
-        Book book = testDataFactory.createSampleBook("비활성 도서");
-        book.set_active(false);
-        bookRepository.save(book);
+        // GIVEN: 도서 하나 만들고, 먼저 소프트 삭제
+        var book = testDataFactory.createSampleBook("재활성화 도서");
 
+        mockMvc.perform(delete("/api/v1/admin/books/{id}", book.getId())
+                        .header("Authorization", "Bearer " + adminAccessToken))
+                .andExpect(status().isOk());
+
+        // WHEN: 재활성화 호출
         mockMvc.perform(patch("/api/v1/admin/books/{id}/activate", book.getId())
                         .header("Authorization", "Bearer " + adminAccessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true));
 
-        Book activated = bookRepository.findById(book.getId()).orElseThrow();
-        assertThat(activated.is_active()).isTrue();
+        // THEN: 다시 검색하면 목록에 나타나야 함
+        String responseBody = mockMvc.perform(get("/api/v1/books")
+                        .param("keyword", "재활성화 도서")
+                        .param("category", "")
+                )
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        JsonNode root = objectMapper.readTree(responseBody);
+        int size = root.path("payload").path("content").size();
+        assertThat(size).isEqualTo(1);
+        assertThat(root.path("payload").path("content").get(0).path("title").asText())
+                .isEqualTo("재활성화 도서");
     }
 }
