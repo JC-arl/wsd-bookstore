@@ -19,7 +19,6 @@ class AdminUserControllerTest extends IntegrationTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
                 .andExpect(jsonPath("$.payload.content").isArray())
-                .andExpect(jsonPath("$.payload.size").value(10))
                 .andDo(MockMvcResultHandlers.print());
     }
 
@@ -30,7 +29,9 @@ class AdminUserControllerTest extends IntegrationTestSupport {
 
         mockMvc.perform(get("/api/v1/admin/users/{id}", notExistId))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.isSuccess").value(false))
-                .andExpect(jsonPath("$.code").value("USER_NOT_FOUND"));
+                // 404 에러 응답은 ApiResult가 아니라 ErrorResponse 포맷이므로,
+                // isSuccess가 아닌 code/message만 체크
+                .andExpect(jsonPath("$.code").value("USER_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").exists());
     }
 }

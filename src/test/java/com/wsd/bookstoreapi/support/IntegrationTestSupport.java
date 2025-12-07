@@ -10,9 +10,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false) // ✅ JWT 필터 등 Security FilterChain 비활성화
+@AutoConfigureMockMvc(addFilters = false) // ✅ 테스트에서는 Security Filter 비활성화
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("test") // src/test/resources/application-test.properties 사용하게 할 수 있음
+@ActiveProfiles("test")                  // ✅ application-test.properties 사용
 public abstract class IntegrationTestSupport {
 
     @Autowired
