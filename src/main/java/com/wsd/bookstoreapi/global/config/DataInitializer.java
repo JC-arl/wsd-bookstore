@@ -37,7 +37,7 @@ public class DataInitializer implements CommandLineRunner {
                     .stockQuantity(10 + random.nextInt(90))
                     .description("샘플 설명 " + i)
                     .publishedAt(LocalDate.of(2020, 1, 1).plusDays(i))
-                    .active(true)
+                    .is_active(true)
                     .build();
 
             bookRepository.save(book);

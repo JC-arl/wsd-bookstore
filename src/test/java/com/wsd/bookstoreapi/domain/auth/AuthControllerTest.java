@@ -29,8 +29,8 @@ class AuthControllerTest extends IntegrationTestSupport {
     void login_success() throws Exception {
         String requestBody = """
                 {
-                  "email": "admin@test.com",
-                  "password": "P@ssw0rd!"
+                  "email": "admin@example.com",
+                  "password": "1q2w3e4r"
                 }
                 """;
 
@@ -55,7 +55,7 @@ class AuthControllerTest extends IntegrationTestSupport {
     void login_fail_wrong_password() throws Exception {
         String requestBody = """
                 {
-                  "email": "admin@test.com",
+                  "email": "admin@example.com",
                   "password": "WrongPassword"
                 }
                 """;

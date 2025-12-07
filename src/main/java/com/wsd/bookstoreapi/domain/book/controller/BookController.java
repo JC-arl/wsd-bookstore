@@ -26,17 +26,15 @@ public class BookController {
             description = "키워드/카테고리/페이지/정렬 조건으로 도서 목록을 조회합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "401", description = "인증 실패")
+            @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping
     public ResponseEntity<ApiResult<Page<BookResponse>>> getBooks(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) String title,
             Pageable pageable
     ) {
-        Page<BookResponse> page = bookService.getBooks(keyword, category, title, pageable);
+        Page<BookResponse> page = bookService.getBooks(keyword, category, pageable);
 
         ApiResult<Page<BookResponse>> apiResult = ApiResult.success(
                 page,

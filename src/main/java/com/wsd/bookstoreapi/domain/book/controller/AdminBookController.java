@@ -67,9 +67,9 @@ public class AdminBookController {
         return ResponseEntity.ok(apiResult);
     }
 
-    @Operation(summary = "도서 소프트딜리트", description = "관리자가 도서를 삭제합니다.")
+    @Operation(summary = "도서 소프트 삭제", description = "관리자가 도서를 비활성화(소프트 딜리트)합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "도서 삭제 성공"),
+            @ApiResponse(responseCode = "200", description = "도서 삭제(비활성화) 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "403", description = "관리자 권한 없음"),
             @ApiResponse(responseCode = "404", description = "대상 도서를 찾을 수 없음")
@@ -78,14 +78,21 @@ public class AdminBookController {
     public ResponseEntity<ApiResult<Void>> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
 
-        ApiResult<Void> apiResult = ApiResult.successMessage("도서가 성공적으로 삭제되었습니다.");
+        ApiResult<Void> apiResult = ApiResult.successMessage("도서가 성공적으로 비활성화되었습니다.");
 
         return ResponseEntity.ok(apiResult);
     }
+
+    @Operation(summary = "도서 재활성화", description = "비활성화된 도서를 다시 활성 상태로 변경합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "도서 재활성화 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "대상 도서를 찾을 수 없음")
+    })
     @PatchMapping("/{id}/activate")
     public ResponseEntity<ApiResult<Void>> activateBook(@PathVariable Long id) {
         bookService.activateBook(id);
         return ResponseEntity.ok(ApiResult.successMessage("도서가 다시 활성화되었습니다."));
     }
-
 }

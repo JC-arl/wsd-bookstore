@@ -2,31 +2,41 @@ package com.wsd.bookstoreapi.support;
 
 import com.wsd.bookstoreapi.domain.book.entity.Book;
 import com.wsd.bookstoreapi.domain.book.repository.BookRepository;
+import com.wsd.bookstoreapi.domain.user.entity.AuthProvider;
 import com.wsd.bookstoreapi.domain.user.entity.User;
+import com.wsd.bookstoreapi.domain.user.entity.UserRole;
 import com.wsd.bookstoreapi.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 @Component
-@RequiredArgsConstructor
 public class TestDataFactory {
 
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public TestDataFactory(UserRepository userRepository,
+                           BookRepository bookRepository,
+                           PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.bookRepository = bookRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     public User createAdminUser() {
-        return userRepository.findByEmail("admin@test.com")
+        return userRepository.findByEmail("admin@example.com")  // ← 테스트 코드와 맞추기
                 .orElseGet(() -> {
                     User user = User.builder()
-                            .email("admin@test.com")
-                            .password(passwordEncoder.encode("P@ssw0rd!"))
+                            .email("admin@example.com")
+                            .password(passwordEncoder.encode("1q2w3e4r"))
                             .name("테스트 관리자")
-                            .role("ROLE_ADMIN")   // 실제 enum/필드에 맞게 수정
-                            .status("ACTIVE")
+                            .role(UserRole.ROLE_ADMIN)
+                            .provider(AuthProvider.LOCAL)
+                            .providerId(null)
+                            .status("ACTIVE")        // enum이면 UserStatus.ACTIVE로 변경
                             .build();
                     return userRepository.save(user);
                 });
@@ -37,10 +47,12 @@ public class TestDataFactory {
                 .orElseGet(() -> {
                     User user = User.builder()
                             .email(email)
-                            .password(passwordEncoder.encode("P@ssw0rd!"))
+                            .password(passwordEncoder.encode("1q2w3e4r"))
                             .name("일반 사용자")
-                            .role("ROLE_USER")
-                            .status("ACTIVE")
+                            .role(UserRole.ROLE_USER)
+                            .provider(AuthProvider.LOCAL)
+                            .providerId(null)
+                            .status("ACTIVE")    // enum 타입이면 여기도 수정
                             .build();
                     return userRepository.save(user);
                 });
@@ -57,6 +69,7 @@ public class TestDataFactory {
                 .stockQuantity(10)
                 .is_active(true)
                 .build();
+
         return bookRepository.save(book);
     }
 }

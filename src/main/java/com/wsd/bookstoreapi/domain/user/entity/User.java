@@ -39,8 +39,9 @@ public class User extends BaseEntity {
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private AuthProvider provider;
+    @Column(name = "provider", nullable = false, length = 20)
+    @Builder.Default
+    private AuthProvider provider = AuthProvider.LOCAL;
 
     // Kakao/Google에서 내려주는 식별자
     @Column(name = "provider_id", length = 100)
