@@ -2,10 +2,13 @@ package com.wsd.bookstoreapi.support;
 
 import com.wsd.bookstoreapi.domain.book.entity.Book;
 import com.wsd.bookstoreapi.domain.book.repository.BookRepository;
+import com.wsd.bookstoreapi.domain.cart.entity.Cart;
+import com.wsd.bookstoreapi.domain.cart.repository.CartRepository;
 import com.wsd.bookstoreapi.domain.user.entity.AuthProvider;
 import com.wsd.bookstoreapi.domain.user.entity.User;
 import com.wsd.bookstoreapi.domain.user.entity.UserRole;
 import com.wsd.bookstoreapi.domain.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -19,13 +22,16 @@ public class TestDataFactory {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CartRepository cartRepository;
 
     public TestDataFactory(UserRepository userRepository,
                            BookRepository bookRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           CartRepository cartRepository) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.passwordEncoder = passwordEncoder;
+        this.cartRepository = cartRepository;
     }
 
     public User createAdminUser() {
@@ -143,4 +149,15 @@ public class TestDataFactory {
 
         return bookRepository.saveAll(books);
     }
+
+    public Cart createCartForUser(User user) {
+        return cartRepository.findByUser(user)
+                .orElseGet(() -> {
+                    Cart cart = Cart.builder()
+                            .user(user)
+                            .build();
+                    return cartRepository.save(cart);
+                });
+    }
+
 }

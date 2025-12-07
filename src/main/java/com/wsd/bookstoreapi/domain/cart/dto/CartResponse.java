@@ -12,27 +12,31 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class CartResponse {
-
-    private Long id;
-    private Long userId;
+    private Long cartId;
     private List<CartItemResponse> items;
+    private int totalQuantity;
     private BigDecimal totalAmount;
 
     public static CartResponse from(Cart cart) {
         List<CartItemResponse> itemResponses = cart.getItems().stream()
                 .map(CartItemResponse::from)
-                .collect(Collectors.toList());
+                .toList();
 
-        BigDecimal total = cart.getItems().stream()
-                .map(ci -> ci.getBook().getPrice()
-                        .multiply(BigDecimal.valueOf(ci.getQuantity())))
+        int totalQty = cart.getItems().stream()
+                .mapToInt(CartItem::getQuantity)
+                .sum();
+
+        BigDecimal totalAmt = cart.getItems().stream()
+                .map(item -> item.getBook().getPrice()
+                        .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return CartResponse.builder()
-                .id(cart.getId())
-                .userId(cart.getUser().getId())
+                .cartId(cart.getId())
                 .items(itemResponses)
-                .totalAmount(total)
+                .totalQuantity(totalQty)
+                .totalAmount(totalAmt)
                 .build();
     }
 }
+

@@ -12,7 +12,10 @@ import com.wsd.bookstoreapi.domain.user.repository.UserRepository;
 import com.wsd.bookstoreapi.global.error.BusinessException;
 import com.wsd.bookstoreapi.global.error.ErrorCode;
 import com.wsd.bookstoreapi.global.security.SecurityUtil;
+import com.wsd.bookstoreapi.global.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,25 +106,45 @@ public class CartService {
     }
     @Transactional
     public CartResponse updateItemQuantity(Long itemId, int quantity) {
-        Long userId = SecurityUtil.getCurrentUserId();
+        Long currentUserId = getCurrentUserId();
 
         CartItem item = cartItemRepository.findById(itemId)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND,
-                        "장바구니 항목을 찾을 수 없습니다."
-                ));
+                .orElseThrow(() ->
+                        new BusinessException(
+                                ErrorCode.RESOURCE_NOT_FOUND,
+                                "장바구니 항목을 찾을 수 없습니다."
+                        )
+                );
 
-        // 본인 장바구니 항목인지 확인
-        if (!item.getCart().getUser().getId().equals(userId)) {
+        // 소유자 검증
+        Cart cart = item.getCart();
+        if (!cart.getUser().getId().equals(currentUserId)) {
             throw new BusinessException(
                     ErrorCode.FORBIDDEN,
                     "본인의 장바구니 항목만 수정할 수 있습니다."
             );
         }
 
+        // 수량 변경 (덮어쓰기 방식)
         item.setQuantity(quantity);
+        // JPA 영속 상태라면 save()는 생략 가능하지만, 명시적으로 적어도 무방
+        cartItemRepository.save(item);
 
-        return CartResponse.from(item.getCart());
+        // 변경된 장바구니 전체를 응답
+        return toCartResponse(cart);
+    }
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal principal)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "인증 정보가 없습니다.");
+        }
+        return principal.getUserId();
+    }
+
+    private CartResponse toCartResponse(Cart cart) {
+        // 프로젝트에 이미 CartResponse.from(cart) 같은 팩토리가 있다면 그걸 사용
+        return CartResponse.from(cart);
     }
 
 }

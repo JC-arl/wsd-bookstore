@@ -53,4 +53,5 @@ public class UserPrincipal implements UserDetails {
     public boolean isEnabled() {
         return true; // User.status 보고 판단하도록 수정 가능
     }
+
 }

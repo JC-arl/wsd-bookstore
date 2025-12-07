@@ -21,6 +21,10 @@ public class ApiResult<T> {
     @Schema(description = "실제 응답 데이터(payload)")
     private final T payload;
 
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
     private ApiResult(boolean isSuccess,
                       String message,
                       String code,

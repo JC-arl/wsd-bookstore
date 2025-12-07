@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.wsd.bookstoreapi.domain.cart.dto.AddCartItemRequest;
@@ -37,7 +38,11 @@ public class CartController {
     ) {
         CartResponse cart = cartService.addItem(request.getBookId(), request.getQuantity());
         ApiResult<CartResponse> apiResult = ApiResult.success(cart, "장바구니 항목 추가 성공");
-        return ResponseEntity.ok(apiResult);
+
+        // 201 Created로 응답
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(apiResult);
     }
     @Operation(summary = "장바구니 항목 수량 변경", description = "특정 장바구니 항목의 수량을 변경합니다.")
     @PatchMapping("/items/{itemId}")
@@ -49,4 +54,5 @@ public class CartController {
         ApiResult<CartResponse> apiResult = ApiResult.success(cart, "장바구니 항목 수량 변경 성공");
         return ResponseEntity.ok(apiResult);
     }
+
 }
