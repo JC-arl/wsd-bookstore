@@ -52,5 +52,5 @@ public class Book extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_active", nullable = false)
-    private boolean active = true;
+    private boolean is_active = true;
 }
