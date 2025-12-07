@@ -29,7 +29,7 @@ public class TestDataFactory {
     }
 
     public User createAdminUser() {
-        return userRepository.findByEmail("admin@example.com")  // ← 테스트 코드와 맞추기
+        return userRepository.findByEmail("admin@example.com")
                 .orElseGet(() -> {
                     User user = User.builder()
                             .email("admin@example.com")
@@ -38,7 +38,7 @@ public class TestDataFactory {
                             .role(UserRole.ROLE_ADMIN)
                             .provider(AuthProvider.LOCAL)
                             .providerId(null)
-                            .status("ACTIVE")        // enum이면 UserStatus.ACTIVE로 변경
+                            .status("ACTIVE")
                             .build();
                     return userRepository.save(user);
                 });
@@ -54,7 +54,7 @@ public class TestDataFactory {
                             .role(UserRole.ROLE_USER)
                             .provider(AuthProvider.LOCAL)
                             .providerId(null)
-                            .status("ACTIVE")    // enum 타입이면 여기도 수정
+                            .status("ACTIVE")
                             .build();
                     return userRepository.save(user);
                 });
@@ -74,14 +74,42 @@ public class TestDataFactory {
 
         return bookRepository.save(book);
     }
+
+    /**
+     * 관리자 도서 테스트용: 특정 ISBN으로 도서 생성
+     */
+    public Book createBookWithIsbn(String isbn, String title, String category) {
+        Book book = Book.builder()
+                .title(title)
+                .author("테스트 저자")
+                .publisher("테스트 출판사")
+                .isbn(isbn)                     // ★ 원하는 ISBN 직접 지정
+                .category(category)
+                .price(BigDecimal.valueOf(25000))
+                .stockQuantity(5)
+                .is_active(true)
+                .build();
+
+        return bookRepository.save(book);
+    }
+
+    /**
+     * 도서 목록 검색용 더미 데이터 (이미 수정해둔 버전 유지)
+     */
     public List<Book> createSampleBooksForSearch() {
         List<Book> books = new ArrayList<>();
+
+        long now = System.currentTimeMillis();
+
+        String isbn1 = "T" + (now % 1_000_000_000L);
+        String isbn2 = "T" + ((now + 1) % 1_000_000_000L);
+        String isbn3 = "T" + ((now + 2) % 1_000_000_000L);
 
         books.add(Book.builder()
                 .title("이펙티브 자바")
                 .author("조슈아 블로크")
                 .publisher("인사이트")
-                .isbn("TEST-ISBN-1")
+                .isbn(isbn1)
                 .category("PROGRAMMING")
                 .price(BigDecimal.valueOf(30000))
                 .stockQuantity(5)
@@ -93,7 +121,7 @@ public class TestDataFactory {
                 .title("자바의 정석")
                 .author("남궁성")
                 .publisher("도우출판")
-                .isbn("TEST-ISBN-2")
+                .isbn(isbn2)
                 .category("PROGRAMMING")
                 .price(BigDecimal.valueOf(28000))
                 .stockQuantity(3)
@@ -105,7 +133,7 @@ public class TestDataFactory {
                 .title("미분적분학 개론")
                 .author("홍길동")
                 .publisher("수학출판사")
-                .isbn("TEST-ISBN-3")
+                .isbn(isbn3)
                 .category("MATH")
                 .price(BigDecimal.valueOf(25000))
                 .stockQuantity(10)
@@ -115,5 +143,4 @@ public class TestDataFactory {
 
         return bookRepository.saveAll(books);
     }
-
 }
