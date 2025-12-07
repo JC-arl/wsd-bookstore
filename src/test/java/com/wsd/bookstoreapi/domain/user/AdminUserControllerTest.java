@@ -61,6 +61,7 @@ class AdminUserControllerTest extends IntegrationTestSupport {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.isSuccess").value(false))
                 .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
     }
 
