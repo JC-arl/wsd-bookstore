@@ -35,10 +35,17 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse createReview(Long bookId, ReviewCreateRequest request) {
-        User user = getCurrentUser();
+        Long userId = SecurityUtil.getCurrentUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."
+                ));
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."));
+                        ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."
+                ));
 
         Review review = Review.builder()
                 .user(user)
@@ -48,8 +55,10 @@ public class ReviewService {
                 .build();
 
         Review saved = reviewRepository.save(review);
+
         return ReviewResponse.from(saved);
     }
+
 
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getReviewsByBook(Long bookId, Pageable pageable) {

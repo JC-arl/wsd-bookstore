@@ -25,17 +25,22 @@ public class HealthService {
     @Value("${spring.profiles.active:local}")
     private String profile;
 
+    // 애플리케이션 기동 시각
     private final Instant startedAt = Instant.now();
 
     public HealthResponse getHealth() {
         String dbStatus = checkDb();
         String redisStatus = checkRedis();
 
+        // 하나라도 DOWN이면 전체 상태 DOWN
+        String overallStatus = ("UP".equals(dbStatus) && "UP".equals(redisStatus)) ? "UP" : "DOWN";
+
         return HealthResponse.builder()
                 .appName(appName)
                 .version(version)
                 .profile(profile)
                 .startedAt(startedAt.toString())
+                .status(overallStatus)
                 .dbStatus(dbStatus)
                 .redisStatus(redisStatus)
                 .build();
@@ -52,6 +57,9 @@ public class HealthService {
 
     private String checkRedis() {
         try {
+            if (redisTemplate.getConnectionFactory() == null) {
+                return "DOWN";
+            }
             String pingResult = redisTemplate.getConnectionFactory()
                     .getConnection()
                     .ping();

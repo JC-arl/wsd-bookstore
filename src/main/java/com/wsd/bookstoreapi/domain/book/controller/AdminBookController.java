@@ -67,7 +67,7 @@ public class AdminBookController {
         return ResponseEntity.ok(apiResult);
     }
 
-    @Operation(summary = "도서 삭제", description = "관리자가 도서를 삭제합니다.")
+    @Operation(summary = "도서 소프트딜리트", description = "관리자가 도서를 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "도서 삭제 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
@@ -82,4 +82,10 @@ public class AdminBookController {
 
         return ResponseEntity.ok(apiResult);
     }
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<ApiResult<Void>> activateBook(@PathVariable Long id) {
+        bookService.activateBook(id);
+        return ResponseEntity.ok(ApiResult.successMessage("도서가 다시 활성화되었습니다."));
+    }
+
 }

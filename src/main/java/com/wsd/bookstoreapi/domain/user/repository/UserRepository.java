@@ -14,8 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    // 만약 관리자 화면에서 유저 + 주문 개수, 리뷰 개수 등을
-    // 바로 엔티티로 로딩해서 보여준다면 이런 것도 가능 (선택)
-    @EntityGraph(attributePaths = {"orders", "reviews"})
+    // 관리자용 목록 조회: orders, reviews 까지 굳이 한 번에 안 가져와도 됨
     Page<User> findAll(Pageable pageable);
 }

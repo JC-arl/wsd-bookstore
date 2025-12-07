@@ -19,4 +19,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @EntityGraph(attributePaths = {"user", "book"})
     Optional<Review> findById(Long id);
+
+    void deleteByBook(Book book);
 }

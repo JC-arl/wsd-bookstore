@@ -17,8 +17,11 @@ public class HealthResponse {
     @Schema(description = "현재 프로파일", example = "local")
     private final String profile;
 
-    @Schema(description = "빌드/시작 시각 (문자열)", example = "2025-12-07T03:00:00")
+    @Schema(description = "서버 시작 시각", example = "2025-12-07T03:00:00Z")
     private final String startedAt;
+
+    @Schema(description = "전체 상태 (UP / DOWN)", example = "UP")
+    private final String status;
 
     @Schema(description = "DB 연결 상태", example = "UP")
     private final String dbStatus;

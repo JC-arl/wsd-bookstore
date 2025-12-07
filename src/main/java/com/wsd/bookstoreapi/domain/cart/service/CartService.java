@@ -2,7 +2,6 @@ package com.wsd.bookstoreapi.domain.cart.service;
 
 import com.wsd.bookstoreapi.domain.book.entity.Book;
 import com.wsd.bookstoreapi.domain.book.repository.BookRepository;
-import com.wsd.bookstoreapi.domain.cart.dto.CartItemRequest;
 import com.wsd.bookstoreapi.domain.cart.dto.CartResponse;
 import com.wsd.bookstoreapi.domain.cart.entity.Cart;
 import com.wsd.bookstoreapi.domain.cart.entity.CartItem;
@@ -17,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -28,99 +27,101 @@ public class CartService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    private Cart getOrCreateCart(User user) {
-        return cartRepository.findByUser(user)
+    @Transactional
+    public CartResponse addItem(Long bookId, int quantity) {
+        Long userId = SecurityUtil.getCurrentUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."));
+
+        Cart cart = cartRepository.findByUser(user)
                 .orElseGet(() -> {
                     Cart newCart = Cart.builder()
                             .user(user)
                             .build();
+
+                    if (newCart.getItems() == null) {
+                        newCart.setItems(new ArrayList<>());
+                    }
+
                     return cartRepository.save(newCart);
                 });
-    }
 
-    private User getCurrentUser() {
-        Long userId = SecurityUtil.getCurrentUserId();
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        if (cart.getItems() == null) {
+            cart.setItems(new ArrayList<>());
+        }
+
+        // 장바구니에 같은 책이 이미 있는지 확인
+        CartItem existingItem = cart.getItems().stream()
+                .filter(ci -> ci.getBook().getId().equals(bookId))
+                .findFirst()
+                .orElse(null);
+
+        if (existingItem != null) {
+            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+        } else {
+            CartItem newItem = CartItem.builder()
+                    .cart(cart)
+                    .book(book)
+                    .quantity(quantity)
+                    .build();
+
+            cart.getItems().add(newItem);
+            cartItemRepository.save(newItem);
+        }
+
+        return CartResponse.from(cart);
     }
 
     @Transactional(readOnly = true)
     public CartResponse getMyCart() {
-        User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
-        return CartResponse.from(cart);
-    }
+        Long userId = SecurityUtil.getCurrentUserId();
 
-    @Transactional
-    public CartResponse addItemToCart(CartItemRequest request) {
-        User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
-
-        Book book = bookRepository.findById(request.getBookId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."));
+                        ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
-        // 이미 같은 책이 있으면 수량만 증가
-        Optional<CartItem> existing = cart.getItems().stream()
-                .filter(i -> i.getBook().getId().equals(book.getId()))
-                .findFirst();
+        Cart cart = cartRepository.findByUser(user)
+                .orElseGet(() -> {
+                    Cart newCart = Cart.builder()
+                            .user(user)
+                            .build();
+                    newCart.setItems(new ArrayList<>());
+                    return newCart;
+                });
 
-        if (existing.isPresent()) {
-            CartItem item = existing.get();
-            item.setQuantity(item.getQuantity() + request.getQuantity());
-        } else {
-            CartItem item = CartItem.builder()
-                    .cart(cart)
-                    .book(book)
-                    .quantity(request.getQuantity())
-                    .build();
-            cart.getItems().add(item);
+        if (cart.getItems() == null) {
+            cart.setItems(new ArrayList<>());
         }
 
         return CartResponse.from(cart);
     }
-
     @Transactional
-    public CartResponse updateCartItem(Long itemId, Integer quantity) {
-        if (quantity == null || quantity < 1) {
+    public CartResponse updateItemQuantity(Long itemId, int quantity) {
+        Long userId = SecurityUtil.getCurrentUserId();
+
+        CartItem item = cartItemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "장바구니 항목을 찾을 수 없습니다."
+                ));
+
+        // 본인 장바구니 항목인지 확인
+        if (!item.getCart().getUser().getId().equals(userId)) {
             throw new BusinessException(
-                    ErrorCode.VALIDATION_FAILED, "수량은 1 이상이어야 합니다.");
+                    ErrorCode.FORBIDDEN,
+                    "본인의 장바구니 항목만 수정할 수 있습니다."
+            );
         }
-
-        User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
-
-        CartItem item = cart.getItems().stream()
-                .filter(i -> i.getId().equals(itemId))
-                .findFirst()
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "장바구니 항목을 찾을 수 없습니다."));
 
         item.setQuantity(quantity);
 
-        return CartResponse.from(cart);
+        return CartResponse.from(item.getCart());
     }
 
-    @Transactional
-    public CartResponse removeCartItem(Long itemId) {
-        User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
-
-        boolean removed = cart.getItems().removeIf(i -> i.getId().equals(itemId));
-
-        if (!removed) {
-            throw new BusinessException(
-                    ErrorCode.RESOURCE_NOT_FOUND, "장바구니 항목을 찾을 수 없습니다.");
-        }
-
-        return CartResponse.from(cart);
-    }
-
-    @Transactional
-    public void clearCart() {
-        User user = getCurrentUser();
-        Cart cart = getOrCreateCart(user);
-        cart.getItems().clear();
-    }
 }

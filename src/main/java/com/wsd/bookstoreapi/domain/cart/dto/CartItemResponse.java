@@ -4,21 +4,29 @@ import com.wsd.bookstoreapi.domain.cart.entity.CartItem;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Builder
 public class CartItemResponse {
+    private Long id;
+    private Long bookId;
+    private String title;
+    private Integer quantity;
+    private BigDecimal unitPrice;
+    private BigDecimal lineTotal;
 
-    private final Long id;
-    private final Long bookId;
-    private final String bookTitle;
-    private final Integer quantity;
+    public static CartItemResponse from(CartItem cartItem) {
+        BigDecimal unitPrice = cartItem.getBook().getPrice();
+        BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
-    public static CartItemResponse from(CartItem item) {
         return CartItemResponse.builder()
-                .id(item.getId())
-                .bookId(item.getBook().getId())
-                .bookTitle(item.getBook().getTitle())
-                .quantity(item.getQuantity())
+                .id(cartItem.getId())
+                .bookId(cartItem.getBook().getId())
+                .title(cartItem.getBook().getTitle())
+                .quantity(cartItem.getQuantity())
+                .unitPrice(unitPrice)
+                .lineTotal(lineTotal)
                 .build();
     }
 }

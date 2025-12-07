@@ -31,4 +31,10 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     // 찜 해제 (유저 + 도서 기준 삭제)
     void deleteByUserAndBook(User user, Book book);
+
+    boolean existsByBook(Book book);  // ✅ 추가
+
+    void deleteByBook(Book book);   // ★ 추가
+
+
 }

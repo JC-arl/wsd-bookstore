@@ -10,14 +10,13 @@ import java.time.LocalDateTime;
 @Builder
 public class ReviewResponse {
 
-    private final Long id;
-    private final Long userId;
-    private final String userName;
-    private final Long bookId;
-    private final Integer rating;
-    private final String content;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private Long id;
+    private Long userId;
+    private String userName;
+    private Long bookId;
+    private int rating;
+    private String content;
+    private LocalDateTime createdAt;
 
     public static ReviewResponse from(Review review) {
         return ReviewResponse.builder()
@@ -28,7 +27,6 @@ public class ReviewResponse {
                 .rating(review.getRating())
                 .content(review.getContent())
                 .createdAt(review.getCreatedAt())
-                .updatedAt(review.getUpdatedAt())
                 .build();
     }
 }

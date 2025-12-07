@@ -50,6 +50,7 @@ public class Book extends BaseEntity {
     @Column(name = "published_at")
     private java.time.LocalDate publishedAt;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
-    private boolean active;
+    private boolean active = true;
 }
