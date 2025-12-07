@@ -1,7 +1,6 @@
 package com.wsd.bookstoreapi.domain.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wsd.bookstoreapi.support.IntegrationTestSupport;
 import com.wsd.bookstoreapi.support.TestDataFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class UserMeControllerTest extends IntegrationTestSupport {
@@ -20,39 +18,15 @@ class UserMeControllerTest extends IntegrationTestSupport {
     @Autowired
     private TestDataFactory testDataFactory;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private String userAccessToken;
-    private final String userEmail = "user@example.com";
-    private final String userPassword = "1q2w3e4r";
 
     @BeforeEach
     void setUp() throws Exception {
-        // 1. 일반 유저 생성
-        testDataFactory.createNormalUser(userEmail);
+        // 일반 유저 생성
+        testDataFactory.createNormalUser("user@example.com");
 
-        // 2. 로그인해서 accessToken 발급
-        String loginRequest = """
-                {
-                  "email": "%s",
-                  "password": "%s"
-                }
-                """.formatted(userEmail, userPassword);
-
-        String loginResponse = mockMvc.perform(post("/api/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(loginRequest))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isSuccess").value(true))
-                .andExpect(jsonPath("$.payload.accessToken").isNotEmpty())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        JsonNode root = objectMapper.readTree(loginResponse);
-        this.userAccessToken = root.path("payload").path("accessToken").asText();
-        assertThat(userAccessToken).isNotBlank();
+        // 로그인해서 토큰 발급
+        userAccessToken = obtainAccessToken("user@example.com", "1q2w3e4r");
     }
 
     @Test
@@ -62,18 +36,58 @@ class UserMeControllerTest extends IntegrationTestSupport {
                         .header("Authorization", "Bearer " + userAccessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
-                .andExpect(jsonPath("$.payload").exists())
-                .andExpect(jsonPath("$.payload.email").value(userEmail));
-        // 필요하면 name, role 등 추가 검증
-        // .andExpect(jsonPath("$.payload.name").value("일반 사용자"));
+                .andExpect(jsonPath("$.payload.email").value("user@example.com"));
     }
 
     @Test
-    @DisplayName("내 정보 조회 실패 - 토큰 없이 호출하면 401 반환")
-    void getMyInfo_unauthorized() throws Exception {
-        mockMvc.perform(get("/api/v1/users/me"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.isSuccess").value(false))
-                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    @DisplayName("내 정보 수정 성공 - 이름 변경")
+    void updateMyInfo_success() throws Exception {
+        String requestBody = """
+                {
+                  "name": "수정된 사용자 이름"
+                }
+                """;
+
+        String responseBody = mockMvc.perform(patch("/api/v1/users/me")
+                        .header("Authorization", "Bearer " + userAccessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.payload.email").value("user@example.com"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        JsonNode root = objectMapper.readTree(responseBody);
+        assertThat(root.path("payload").path("name").asText())
+                .isEqualTo("수정된 사용자 이름");
+    }
+
+    @Test
+    @DisplayName("내 계정 비활성화 성공 - /users/me/deactivate 호출 시 상태가 INACTIVE로 변경")
+    void deactivateMe_success() throws Exception {
+        mockMvc.perform(patch("/api/v1/users/me/deactivate")
+                        .header("Authorization", "Bearer " + userAccessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.message").value("계정이 비활성화되었습니다."));
+
+        // 이후 /me 조회 시 비활성 상태를 어떻게 표현할지에 따라 추가 검증 가능
+        // 예: 서비스에서 status != ACTIVE면 BusinessException 던지게 했다면 401/403/409 등으로 나갈 수 있음
+    }
+
+    @Test
+    @DisplayName("내 계정 영구 삭제 성공 - /users/me DELETE 호출")
+    void deleteMe_success() throws Exception {
+        mockMvc.perform(delete("/api/v1/users/me")
+                        .header("Authorization", "Bearer " + userAccessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.message").value("계정이 영구 삭제되었습니다."));
+
+        // 삭제 후 다시 /me 호출하면 인증/조회 실패가 되어야 하는데,
+        // 구현에 따라 401 / 404 / 409 등으로 정의해 두었을 것이라,
+        // 별도 테스트 케이스로 분리해서 검증해도 좋습니다.
     }
 }

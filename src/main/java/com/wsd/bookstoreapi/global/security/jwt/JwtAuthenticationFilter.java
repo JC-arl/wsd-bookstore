@@ -15,11 +15,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.wsd.bookstoreapi.domain.auth.service.RedisAuthTokenService;
 import com.wsd.bookstoreapi.global.error.BusinessException;
 import com.wsd.bookstoreapi.global.error.ErrorCode;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;

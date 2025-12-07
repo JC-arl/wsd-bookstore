@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.wsd.bookstoreapi.domain.auth.service.RedisAuthTokenService;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @RequiredArgsConstructor
@@ -36,7 +37,12 @@ public class SecurityConfig {
 
                         // 관리자 전용 API
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-
+                        // 내 정보 조회는 "인증만" 필요
+                        .requestMatchers(
+                                "/api/v1/users/me",
+                                "/api/v1/users/me/**"
+                        ).authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/books/**").permitAll()
                         // 그 외 모든 API는 인증 필요
                         .anyRequest().authenticated()
                 )

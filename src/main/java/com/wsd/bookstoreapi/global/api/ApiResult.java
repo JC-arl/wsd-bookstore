@@ -12,10 +12,6 @@ public class ApiResult<T> {
     @Schema(description = "요청 성공 여부", example = "true")
     private final boolean isSuccess;
 
-    @JsonProperty("success")
-    @Schema(description = "요청 성공 여부 (호환용)", example = "true")
-    private final boolean success;
-
     @Schema(description = "결과 메시지", example = "요청이 성공적으로 처리되었습니다.")
     private final String message;
 
@@ -26,12 +22,10 @@ public class ApiResult<T> {
     private final T payload;
 
     private ApiResult(boolean isSuccess,
-                      boolean success,
                       String message,
                       String code,
                       T payload) {
         this.isSuccess = isSuccess;
-        this.success = success;
         this.message = message;
         this.code = code;
         this.payload = payload;
@@ -41,7 +35,6 @@ public class ApiResult<T> {
 
     public static <T> ApiResult<T> success(T payload, String message) {
         return new ApiResult<>(
-                true,
                 true,
                 message,
                 null,   // 에러 코드 없음
@@ -55,7 +48,6 @@ public class ApiResult<T> {
 
     public static ApiResult<Void> successMessage(String message) {
         return new ApiResult<>(
-                true,
                 true,
                 message,
                 null,
@@ -73,7 +65,6 @@ public class ApiResult<T> {
 
         return new ApiResult<>(
                 false,
-                false,
                 msg,
                 errorCode.getCode(),   // "UNAUTHORIZED", "RESOURCE_NOT_FOUND" 등
                 null
@@ -88,7 +79,6 @@ public class ApiResult<T> {
 
         return new ApiResult<>(
                 false,
-                false,
                 msg,
                 errorCode.getCode(),
                 payload
@@ -98,7 +88,6 @@ public class ApiResult<T> {
     // 단순 메시지 기반 실패 (ErrorCode 없이)
     public static ApiResult<Void> failure(String message) {
         return new ApiResult<>(
-                false,
                 false,
                 message,
                 null,
