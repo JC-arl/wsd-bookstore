@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class TestDataFactory {
@@ -72,4 +74,46 @@ public class TestDataFactory {
 
         return bookRepository.save(book);
     }
+    public List<Book> createSampleBooksForSearch() {
+        List<Book> books = new ArrayList<>();
+
+        books.add(Book.builder()
+                .title("이펙티브 자바")
+                .author("조슈아 블로크")
+                .publisher("인사이트")
+                .isbn("TEST-ISBN-1")
+                .category("PROGRAMMING")
+                .price(BigDecimal.valueOf(30000))
+                .stockQuantity(5)
+                .is_active(true)
+                .build()
+        );
+
+        books.add(Book.builder()
+                .title("자바의 정석")
+                .author("남궁성")
+                .publisher("도우출판")
+                .isbn("TEST-ISBN-2")
+                .category("PROGRAMMING")
+                .price(BigDecimal.valueOf(28000))
+                .stockQuantity(3)
+                .is_active(true)
+                .build()
+        );
+
+        books.add(Book.builder()
+                .title("미분적분학 개론")
+                .author("홍길동")
+                .publisher("수학출판사")
+                .isbn("TEST-ISBN-3")
+                .category("MATH")
+                .price(BigDecimal.valueOf(25000))
+                .stockQuantity(10)
+                .is_active(true)
+                .build()
+        );
+
+        return bookRepository.saveAll(books);
+    }
+
 }
