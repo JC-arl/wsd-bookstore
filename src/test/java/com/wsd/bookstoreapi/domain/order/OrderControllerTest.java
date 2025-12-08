@@ -80,10 +80,12 @@ class OrderControllerTest extends IntegrationTestSupport {
     @DisplayName("주문 생성 성공 - 장바구니 기반으로 주문 생성")
     void createOrder_success() throws Exception {
         String requestBody = """
-                {
-                  "address": "서울시 테스트로 123"
-                }
-                """;
+        {
+          "receiverName": "홍길동",
+          "address": "서울시 테스트로 123"
+        }
+        """;
+
 
         // WHEN: 주문 생성 요청
         String responseBody = mockMvc.perform(post("/api/v1/orders")
@@ -131,10 +133,11 @@ class OrderControllerTest extends IntegrationTestSupport {
         String emptyUserToken = obtainAccessToken("emptycart@example.com", "1q2w3e4r");
 
         String requestBody = """
-                {
-                  "address": "서울시 어딘가"
-                }
-                """;
+        {
+          "receiverName": "아무개",
+          "address": "서울시 어딘가"
+        }
+        """;
 
         mockMvc.perform(post("/api/v1/orders")
                         .header("Authorization", "Bearer " + emptyUserToken)
@@ -150,10 +153,11 @@ class OrderControllerTest extends IntegrationTestSupport {
     void getMyOrders_success() throws Exception {
         // GIVEN: 먼저 주문 하나 생성
         String createRequest = """
-                {
-                  "address": "서울시 테스트로 123"
-                }
-                """;
+        {
+          "receiverName": "홍길동",
+          "address": "서울시 테스트로 123"
+        }
+        """;
 
         String createResponse = mockMvc.perform(post("/api/v1/orders")
                         .header("Authorization", "Bearer " + userAccessToken)
@@ -198,10 +202,11 @@ class OrderControllerTest extends IntegrationTestSupport {
     void getMyOrder_forbidden_otherUser() throws Exception {
         // GIVEN: user로 주문 하나 생성
         String createRequest = """
-                {
-                  "address": "서울시 테스트로 123"
-                }
-                """;
+        {
+          "receiverName": "홍길동",
+          "address": "서울시 테스트로 123"
+        }
+        """;
 
         String createResponse = mockMvc.perform(post("/api/v1/orders")
                         .header("Authorization", "Bearer " + userAccessToken)
@@ -232,10 +237,11 @@ class OrderControllerTest extends IntegrationTestSupport {
     void cancelMyOrder_success() throws Exception {
         // GIVEN: 주문 하나 생성
         String createRequest = """
-                {
-                  "address": "서울시 테스트로 123"
-                }
-                """;
+        {
+          "receiverName": "홍길동",
+          "address": "서울시 테스트로 123"
+        }
+        """;
 
         String createResponse = mockMvc.perform(post("/api/v1/orders")
                         .header("Authorization", "Bearer " + userAccessToken)
@@ -265,11 +271,11 @@ class OrderControllerTest extends IntegrationTestSupport {
     void cancelMyOrder_fail_completed() throws Exception {
         // GIVEN: 주문 하나 생성
         String createRequest = """
-                {
-                  "address": "서울시 테스트로 123"
-                }
-                """;
-
+        {
+          "receiverName": "홍길동",
+          "address": "서울시 테스트로 123"
+        }
+        """;
         String createResponse = mockMvc.perform(post("/api/v1/orders")
                         .header("Authorization", "Bearer " + userAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)

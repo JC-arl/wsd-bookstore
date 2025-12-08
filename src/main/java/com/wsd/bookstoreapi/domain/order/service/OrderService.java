@@ -44,7 +44,7 @@ public class OrderService {
 
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "장바구니가 비어 있습니다."));
+                        ErrorCode.STATE_CONFLICT, "장바구니가 비어 있습니다."));
 
         if (cart.getItems().isEmpty()) {
             throw new BusinessException(

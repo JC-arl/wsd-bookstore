@@ -26,6 +26,15 @@ public abstract class IntegrationTestSupport {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @Autowired
+    protected com.wsd.bookstoreapi.global.security.jwt.JwtTokenProvider jwtTokenProvider;
+
+    // 테스트용 직접 토큰 생성 헬퍼
+    protected String generateAccessToken(Long userId, String email, String role) {
+        // 주의: 실제 UserPrincipal에서 "ROLE_" prefix 를 어떻게 붙이는지에 따라
+        // 여기 role 값은 "USER" / "ADMIN" 이어야 합니다.
+        return jwtTokenProvider.generateAccessToken(userId, email, role);
+    }
     /**
      * 테스트용 로그인 → accessToken 발급 헬퍼
      *   - 테스트에서: testDataFactory.createNormalUser(email) 해 둔 뒤

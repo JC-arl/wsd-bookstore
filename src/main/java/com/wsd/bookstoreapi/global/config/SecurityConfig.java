@@ -1,5 +1,6 @@
 package com.wsd.bookstoreapi.global.config;
 
+import com.wsd.bookstoreapi.global.security.JwtAccessDeniedHandler;
 import com.wsd.bookstoreapi.global.security.JwtAuthenticationEntryPoint;
 import com.wsd.bookstoreapi.global.security.jwt.JwtAuthenticationFilter;
 import com.wsd.bookstoreapi.global.security.jwt.JwtTokenProvider;
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final RedisAuthTokenService redisAuthTokenService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,6 +38,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
                         // 헬스체크, 문서, 인증용 엔드포인트는 항상 허용

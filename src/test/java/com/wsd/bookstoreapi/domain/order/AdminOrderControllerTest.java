@@ -1,3 +1,4 @@
+
 package com.wsd.bookstoreapi.domain.order;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -66,10 +67,11 @@ class AdminOrderControllerTest extends IntegrationTestSupport {
 
         // 3) 이 사용자로 실제 주문 하나 생성
         String createRequest = """
-                {
-                  "address": "서울시 관리자 테스트로 1"
-                }
-                """;
+        {
+          "receiverName": "홍길동",
+          "address": "서울시 테스트로 123"
+        }
+        """;
 
         String createResponse = mockMvc.perform(post("/api/v1/orders")
                         .header("Authorization", "Bearer " + userAccessToken)
@@ -152,3 +154,4 @@ class AdminOrderControllerTest extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.code").value("FORBIDDEN"));
     }
 }
+
