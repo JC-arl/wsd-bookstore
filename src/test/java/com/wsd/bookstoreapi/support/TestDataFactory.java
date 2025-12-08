@@ -4,6 +4,8 @@ import com.wsd.bookstoreapi.domain.book.entity.Book;
 import com.wsd.bookstoreapi.domain.book.repository.BookRepository;
 import com.wsd.bookstoreapi.domain.cart.entity.Cart;
 import com.wsd.bookstoreapi.domain.cart.repository.CartRepository;
+import com.wsd.bookstoreapi.domain.favorite.entity.Favorite;
+import com.wsd.bookstoreapi.domain.favorite.repository.FavoriteRepository;
 import com.wsd.bookstoreapi.domain.user.entity.AuthProvider;
 import com.wsd.bookstoreapi.domain.user.entity.User;
 import com.wsd.bookstoreapi.domain.user.entity.UserRole;
@@ -23,15 +25,20 @@ public class TestDataFactory {
     private final BookRepository bookRepository;
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
+    private final FavoriteRepository favoriteRepository;
 
     public TestDataFactory(UserRepository userRepository,
                            BookRepository bookRepository,
+                           FavoriteRepository favoriteRepository,
                            PasswordEncoder passwordEncoder,
                            CartRepository cartRepository) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.passwordEncoder = passwordEncoder;
         this.cartRepository = cartRepository;
+        this.favoriteRepository = favoriteRepository;
+
+
     }
 
     public User createAdminUser() {
@@ -158,6 +165,14 @@ public class TestDataFactory {
                             .build();
                     return cartRepository.save(cart);
                 });
+    }
+    // 찜(Favorite) 생성 헬퍼
+    public Favorite createFavorite(User user, Book book) {
+        Favorite favorite = Favorite.builder()
+                .user(user)
+                .book(book)
+                .build();
+        return favoriteRepository.save(favorite);
     }
 
 }

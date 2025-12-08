@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,7 @@ public class FavoriteController {
 
     @Operation(summary = "도서 찜 추가", description = "도서를 내 찜 목록에 추가합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "추가 성공"),
+            @ApiResponse(responseCode = "201", description = "추가 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "도서를 찾을 수 없음"),
             @ApiResponse(responseCode = "409", description = "이미 찜한 도서")
@@ -47,7 +48,7 @@ public class FavoriteController {
     public ResponseEntity<ApiResult<Void>> addFavorite(@PathVariable Long bookId) {
         favoriteService.addFavorite(bookId);
         ApiResult<Void> apiResult = ApiResult.successMessage("도서가 찜 목록에 추가되었습니다.");
-        return ResponseEntity.ok(apiResult);
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResult);
     }
 
     @Operation(summary = "도서 찜 해제", description = "도서를 찜 목록에서 제거합니다.")
