@@ -35,28 +35,41 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse createReview(Long bookId, ReviewCreateRequest request) {
+        // 1) 현재 로그인 사용자 조회
         Long userId = SecurityUtil.getCurrentUserId();
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."
+                        ErrorCode.USER_NOT_FOUND,
+                        "사용자를 찾을 수 없습니다."
                 ));
 
+        // 2) 도서 조회
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "도서를 찾을 수 없습니다."
                 ));
 
+        // 3) 이미 이 유저가 이 도서에 리뷰를 썼는지 확인
+        reviewRepository.findByUserAndBook(user, book)
+                .ifPresent(r -> {
+                    throw new BusinessException(
+                            ErrorCode.DUPLICATE_RESOURCE,
+                            "이미 이 도서에 리뷰를 작성하셨습니다."
+                    );
+                });
+
+        // 4) 새 리뷰 생성
         Review review = Review.builder()
                 .user(user)
                 .book(book)
                 .rating(request.getRating())
-                .content(request.getContent())
+                .content(request.getContent())   // 필드명 엔티티에 맞게
                 .build();
 
-        Review saved = reviewRepository.save(review);
+        reviewRepository.save(review);
 
-        return ReviewResponse.from(saved);
+        return ReviewResponse.from(review);
     }
 
 
