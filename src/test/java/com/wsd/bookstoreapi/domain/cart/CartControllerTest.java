@@ -79,9 +79,14 @@ class CartControllerTest extends IntegrationTestSupport {
 
         // DB 검증
         CartItem saved = cartItemRepository.findById(cartItemId).orElseThrow();
-        assertThat(saved.getCart().getUser().getId()).isEqualTo(user.getId());
+
+        // ✅ Cart의 user까지 가지 말고, Cart의 id만 검증
+        assertThat(saved.getCart().getId()).isEqualTo(cart.getId());
+
+        // 나머지는 동일
         assertThat(saved.getBook().getId()).isEqualTo(book.getId());
         assertThat(saved.getQuantity()).isEqualTo(2);
+
     }
 
     @Test
