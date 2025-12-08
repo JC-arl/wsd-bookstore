@@ -13,6 +13,8 @@ import com.wsd.bookstoreapi.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import com.wsd.bookstoreapi.domain.review.entity.Review;
+import com.wsd.bookstoreapi.domain.review.repository.ReviewRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,18 +27,22 @@ public class TestDataFactory {
     private final BookRepository bookRepository;
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
+    private final ReviewRepository reviewRepository;
+
     private final FavoriteRepository favoriteRepository;
 
     public TestDataFactory(UserRepository userRepository,
                            BookRepository bookRepository,
                            FavoriteRepository favoriteRepository,
                            PasswordEncoder passwordEncoder,
+                           ReviewRepository reviewRepository,
                            CartRepository cartRepository) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.passwordEncoder = passwordEncoder;
         this.cartRepository = cartRepository;
         this.favoriteRepository = favoriteRepository;
+        this.reviewRepository = reviewRepository;
 
 
     }
@@ -173,6 +179,17 @@ public class TestDataFactory {
                 .book(book)
                 .build();
         return favoriteRepository.save(favorite);
+    }
+    // 헬퍼 메서드 추가
+    public Review createReview(User user, Book book, int rating, String content) {
+        Review review = Review.builder()
+                .user(user)
+                .book(book)
+                .rating(rating)
+                .content(content) // 엔티티에 맞는 필드명으로 맞춰주세요 (예: comment, text 등)
+                .build();
+
+        return reviewRepository.save(review);
     }
 
 }

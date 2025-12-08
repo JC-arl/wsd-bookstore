@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class ReviewController {
 
     @Operation(summary = "도서 리뷰 작성", description = "특정 도서에 대한 리뷰를 작성합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "리뷰 작성 성공"),
+            @ApiResponse(responseCode = "201", description = "리뷰 작성 성공"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 평점/내용"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "도서를 찾을 수 없음")
@@ -33,15 +34,14 @@ public class ReviewController {
     @PostMapping("/api/v1/books/{bookId}/reviews")
     public ResponseEntity<ApiResult<ReviewResponse>> createReview(
             @PathVariable Long bookId,
-            @Valid @RequestBody ReviewCreateRequest request
+            @RequestBody @Valid ReviewCreateRequest request
     ) {
-        ReviewResponse reviewResponse = reviewService.createReview(bookId, request);
-        ApiResult<ReviewResponse> apiResult = ApiResult.success(
-                reviewResponse,
-                "리뷰가 성공적으로 등록되었습니다."
-        );
-        return ResponseEntity.ok(apiResult);
+        ReviewResponse response = reviewService.createReview(bookId, request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResult.success(response, "리뷰 생성 성공"));
     }
+
 
     @Operation(summary = "도서별 리뷰 목록 조회", description = "특정 도서에 대한 리뷰 목록을 조회합니다.")
     @ApiResponses({
