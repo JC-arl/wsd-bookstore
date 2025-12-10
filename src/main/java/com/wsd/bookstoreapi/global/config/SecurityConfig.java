@@ -52,6 +52,10 @@ public class SecurityConfig {
                         // 관리자 전용 API
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/books/**").permitAll()
+
+                        // CORS preflight(OPTIONS) 허용해주는 것도 안전함
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         // 그 외 모든 API는 인증 필요
                         .anyRequest().authenticated()
                 )
