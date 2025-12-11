@@ -1,0 +1,57 @@
+헬스체# Git
+.git
+.gitignore
+.gitattributes
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+bin/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+*.swp
+*.swo
+*~
+
+# 환경 설정 및 민감한 정보
+.env
+.env.local
+.env.*.local
+*.pem
+*.ppk
+
+# 로그 파일
+*.log
+logs/
+
+# 운영체제
+.DS_Store
+Thumbs.db
+
+# 테스트 및 커버리지
+coverage/
+*.class
+
+# Docker 관련
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 문서 (선택적 - 필요하면 주석 처리)
+README.md
+docs/
+check.md
+dev.md
+
+# 기타
+tmp/
+temp/
+*.tmp

@@ -163,23 +163,23 @@ bookstore-api/
 
 7. N+1 쿼리 제거 (성능 개선)
 적용한 최적화
-7.1 찜 목록 조회 Favorite → Book JOIN
-```java
 
+```java
+7.1 찜 목록 조회 Favorite → Book JOIN
 @EntityGraph(attributePaths = {"book"})
 Page<Favorite> findByUser(User user, Pageable pageable);
-7.2 장바구니 Cart → CartItem → Book JOIN
 ```
 ```java
+7.2 장바구니 Cart → CartItem → Book JOIN
 @EntityGraph(attributePaths = {"items", "items.book"})
 Optional<Cart> findWithItemsByUser(User user);
-7.3 주문 Order → OrderItem → Book JOIN
 ```
 ```java
+7.3 주문 Order → OrderItem → Book JOIN
 @EntityGraph(attributePaths = {"orderItems", "orderItems.book"})
 Page<Order> findByUser(User user, Pageable pageable);
-필요한 연관관계를 즉시 fetch 하여 N+1 문제 제거.
 ```
+- 필요한 연관관계를 즉시 fetch 하여 N+1 문제 제거.
 
 8. 인증 구조 (JWT + Redis)
 ### Access Token

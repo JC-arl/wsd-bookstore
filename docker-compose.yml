@@ -7,24 +7,37 @@ services:
       dockerfile: Dockerfile
     container_name: bookstore-app
     ports:
-      - "${APP_PORT}:9090"
+      - "${APP_PORT:-9090}:${SERVER_PORT:-9090}"   # host:container
     environment:
+      # Spring profile & server port
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=utf8
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SERVER_PORT: ${SERVER_PORT}
+
+      # DB (Spring이 ${DB_URL}, ${DB_USERNAME}, ${DB_PASSWORD} 참조)
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
 
       # JWT
       JWT_SECRET: ${JWT_SECRET}
       JWT_AT_EXPIRE: ${JWT_AT_EXPIRE}
       JWT_RT_EXPIRE: ${JWT_RT_EXPIRE}
 
-      # Redis
-      SPRING_REDIS_HOST: ${REDIS_HOST}
-      SPRING_REDIS_PORT: ${REDIS_PORT}
+      # Redis (Spring이 ${REDIS_HOST}, ${REDIS_PORT} 참조)
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${SERVER_PORT:-9090}/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
 
   mysql:
     image: mysql:8.0
@@ -39,13 +52,24 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
 
   redis:
     image: redis:7
     container_name: bookstore-redis
     restart: always
     ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 volumes:
   mysql_data:
