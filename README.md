@@ -89,7 +89,7 @@ cp .env.example .env
 docker-compose up -d
 
 # 4. 헬스체크
-curl http://localhost:9090/health
+curl http://localhost:8080/health
 ```
 
 ### 2. 로컬 실행
@@ -131,7 +131,7 @@ docker-compose down -v
 | 변수명 | 설명 | 예시 값 |
 |--------|------|---------|
 | `SPRING_PROFILES_ACTIVE` | Spring Profile | `local` / `prod` |
-| `SERVER_PORT` | 애플리케이션 포트 | `9090` |
+| `SERVER_PORT` | 애플리케이션 포트 | `8080` |
 | `DB_URL` | MySQL 접속 URL | `jdbc:mysql://mysql:3306/bookstore` |
 | `DB_USERNAME` | DB 사용자명 | `bookstore_user` |
 | `DB_PASSWORD` | DB 비밀번호 | `your_password` |
@@ -146,16 +146,14 @@ docker-compose down -v
 ## 배포 주소
 
 ### Local
-- **Base URL**: `http://localhost:9090/api/v1`
-- **Swagger URL**: `http://localhost:9090/swagger-ui/index.html`
-- **Health URL**: `http://localhost:9090/health`
+- **Base URL**: `http://localhost:8080/api/v1`
+- **Swagger URL**: `http://localhost:8080/swagger-ui/index.html`
+- **Health URL**: `http://localhost:8080/health`
 
-### Production (JCloud)
-- **Base URL**: `http://{JCLOUD_IP}:{PORT}/api/v1`
-- **Swagger URL**: `http://{JCLOUD_IP}:{PORT}/swagger-ui/index.html`
-- **Health URL**: `http://{JCLOUD_IP}:{PORT}/health`
-
-*(배포 후 실제 주소로 업데이트 예정)*
+### Production (JCloud - Docker Deployed)
+- **Base URL**: `http://113.198.66.68:10088/api/v1`
+- **Swagger URL**: `http://113.198.66.68:10088/swagger-ui/index.html`
+- **Health URL**: `http://113.198.66.68:10088/health`
 
 ## 인증 플로우
 
@@ -427,7 +425,8 @@ open build/reports/tests/test/index.html
 ## 문서
 
 ### API 문서
-- **Swagger UI**: `http://localhost:9090/swagger-ui/index.html`
+- **Swagger UI (Local)**: `http://localhost:8080/swagger-ui/index.html`
+- **Swagger UI (Production)**: `http://113.198.66.68:10088/swagger-ui/index.html`
 - **API 설계**: [docs/api-design.md](docs/api-design.md)
 
 ### 기술 문서
