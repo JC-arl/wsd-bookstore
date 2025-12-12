@@ -58,9 +58,36 @@ public class UserService {
      * 내 계정 비활성화(소프트 삭제)
      */
     @Transactional
-    public void deactivateMe() {
+    public UserMeResponse deactivateMe() {
         User user = getCurrentUser();
-        user.setStatus("INACTIVE"); // enum이면 UserStatus.INACTIVE 등으로 변경
+
+        if ("INACTIVE".equalsIgnoreCase(user.getStatus())) {
+            throw new BusinessException(
+                    ErrorCode.STATE_CONFLICT,
+                    "이미 비활성화된 계정입니다."
+            );
+        }
+
+        user.setStatus("INACTIVE");
+        return UserMeResponse.from(user);
+    }
+
+    /**
+     * 내 계정 재활성화
+     */
+    @Transactional
+    public UserMeResponse activateMe() {
+        User user = getCurrentUser();
+
+        if ("ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            throw new BusinessException(
+                    ErrorCode.STATE_CONFLICT,
+                    "이미 활성화된 계정입니다."
+            );
+        }
+
+        user.setStatus("ACTIVE");
+        return UserMeResponse.from(user);
     }
 
     /**

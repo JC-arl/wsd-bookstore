@@ -16,6 +16,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Tag(name = "Auth", description = "인증 / 토큰 발급 / 로그아웃 API")
@@ -25,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class AuthController {
 
     private final AuthService authService;
+    private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "회원가입", description = "새로운 사용자 계정을 생성합니다.")
     @ApiResponses({
@@ -88,5 +92,38 @@ public class AuthController {
 
         ApiResult<Void> apiResult = ApiResult.successMessage("로그아웃 되었습니다.");
         return ResponseEntity.ok(apiResult);
+    }
+
+    // 임시 테스트 엔드포인트 - BCrypt 해시 생성 및 검증
+    @Operation(summary = "[테스트] BCrypt 해시 생성 및 검증", description = "password123의 BCrypt 해시를 생성하고 기존 해시와 비교합니다.")
+    @GetMapping("/test-bcrypt")
+    public ResponseEntity<Map<String, Object>> testBcrypt() {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            String rawPassword = "password123";
+            String dbHash = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+
+            result.put("rawPassword", rawPassword);
+            result.put("dbHash", dbHash);
+            result.put("passwordEncoderExists", passwordEncoder != null);
+
+            if (passwordEncoder != null) {
+                result.put("dbHashMatches", passwordEncoder.matches(rawPassword, dbHash));
+                result.put("newGeneratedHash1", passwordEncoder.encode(rawPassword));
+                result.put("newGeneratedHash2", passwordEncoder.encode(rawPassword));
+                result.put("newGeneratedHash3", passwordEncoder.encode(rawPassword));
+            } else {
+                result.put("error", "PasswordEncoder is null");
+            }
+
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("error", e.getMessage());
+            result.put("errorClass", e.getClass().getName());
+        }
+
+        return ResponseEntity.ok(result);
     }
 }

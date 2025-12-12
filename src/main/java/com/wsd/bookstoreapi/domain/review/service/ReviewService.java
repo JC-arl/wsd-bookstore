@@ -91,17 +91,17 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponse updateMyReview(Long reviewId, ReviewUpdateRequest request) {
+    public ReviewResponse updateMyReview(Long bookId, ReviewUpdateRequest request) {
         User user = getCurrentUser();
 
-        Review review = reviewRepository.findById(reviewId)
+        Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+                        ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."));
 
-        if (!review.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(
-                    ErrorCode.FORBIDDEN, "본인의 리뷰만 수정할 수 있습니다.");
-        }
+        Review review = reviewRepository.findByUserAndBook(user, book)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "해당 도서에 대한 리뷰를 찾을 수 없습니다."));
 
         if (request.getRating() != null) {
             review.setRating(request.getRating());
@@ -114,17 +114,17 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteMyReview(Long reviewId) {
+    public void deleteMyReview(Long bookId) {
         User user = getCurrentUser();
 
-        Review review = reviewRepository.findById(reviewId)
+        Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BusinessException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "리뷰를 찾을 수 없습니다."));
+                        ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."));
 
-        if (!review.getUser().getId().equals(user.getId())) {
-            throw new BusinessException(
-                    ErrorCode.FORBIDDEN, "본인의 리뷰만 삭제할 수 있습니다.");
-        }
+        Review review = reviewRepository.findByUserAndBook(user, book)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "해당 도서에 대한 리뷰를 찾을 수 없습니다."));
 
         reviewRepository.delete(review);
     }

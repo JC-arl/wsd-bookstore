@@ -76,19 +76,19 @@ public class ReviewController {
         return ResponseEntity.ok(apiResult);
     }
 
-    @Operation(summary = "내 리뷰 수정", description = "로그인한 사용자가 본인의 리뷰를 수정합니다.")
+    @Operation(summary = "내 리뷰 수정", description = "로그인한 사용자가 특정 도서에 작성한 본인의 리뷰를 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "403", description = "본인의 리뷰가 아님"),
-            @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "도서 또는 리뷰를 찾을 수 없음")
     })
-    @PatchMapping("/api/v1/reviews/{id}")
+    @PatchMapping("/api/v1/books/{bookId}/reviews/me")
     public ResponseEntity<ApiResult<ReviewResponse>> updateMyReview(
-            @PathVariable Long id,
+            @PathVariable Long bookId,
             @Valid @RequestBody ReviewUpdateRequest request
     ) {
-        ReviewResponse reviewResponse = reviewService.updateMyReview(id, request);
+        ReviewResponse reviewResponse = reviewService.updateMyReview(bookId, request);
         ApiResult<ReviewResponse> apiResult = ApiResult.success(
                 reviewResponse,
                 "리뷰가 성공적으로 수정되었습니다."
@@ -103,9 +103,9 @@ public class ReviewController {
             @ApiResponse(responseCode = "403", description = "본인의 리뷰가 아님"),
             @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음")
     })
-    @DeleteMapping("/api/v1/reviews/{id}")
-    public ResponseEntity<ApiResult<Void>> deleteMyReview(@PathVariable Long id) {
-        reviewService.deleteMyReview(id);
+    @DeleteMapping("/api/v1/books/{bookId}/reviews/me")
+    public ResponseEntity<ApiResult<Void>> deleteMyReview(@PathVariable Long bookId) {
+        reviewService.deleteMyReview(bookId);
         ApiResult<Void> apiResult = ApiResult.successMessage("리뷰가 성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(apiResult);
     }

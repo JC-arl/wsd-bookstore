@@ -45,9 +45,9 @@ public class FavoriteController {
             @ApiResponse(responseCode = "409", description = "이미 찜한 도서")
     })
     @PostMapping("/{bookId}")
-    public ResponseEntity<ApiResult<Void>> addFavorite(@PathVariable Long bookId) {
-        favoriteService.addFavorite(bookId);
-        ApiResult<Void> apiResult = ApiResult.successMessage("도서가 찜 목록에 추가되었습니다.");
+    public ResponseEntity<ApiResult<FavoriteResponse>> addFavorite(@PathVariable Long bookId) {
+        FavoriteResponse response = favoriteService.addFavorite(bookId);
+        ApiResult<FavoriteResponse> apiResult = ApiResult.success(response, "도서가 찜 목록에 추가되었습니다.");
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResult);
     }
 
@@ -58,9 +58,9 @@ public class FavoriteController {
             @ApiResponse(responseCode = "404", description = "도서를 찾을 수 없음")
     })
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<ApiResult<Void>> removeFavorite(@PathVariable Long bookId) {
-        favoriteService.removeFavorite(bookId);
-        ApiResult<Void> apiResult = ApiResult.successMessage("도서가 찜 목록에서 제거되었습니다.");
+    public ResponseEntity<ApiResult<FavoriteResponse>> removeFavorite(@PathVariable Long bookId) {
+        FavoriteResponse response = favoriteService.removeFavorite(bookId);
+        ApiResult<FavoriteResponse> apiResult = ApiResult.success(response, "도서가 찜 목록에서 제거되었습니다.");
         return ResponseEntity.ok(apiResult);
     }
 }

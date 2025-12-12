@@ -1,26 +1,26 @@
 -- 사용자 데이터 (관리자 1명, 일반 사용자 14명)
--- 비밀번호는 모두 "password123" (BCrypt 해시: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy)
+-- 비밀번호는 모두 "password123" (BCrypt 해시: $2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O)
 INSERT INTO users (email, name, password, role, provider, status, created_at, updated_at)
 VALUES
-    ('admin@example.com', '관리자', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_ADMIN', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user1@example.com', '김철수', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user2@example.com', '이영희', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user3@example.com', '박민수', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user4@example.com', '최지영', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user5@example.com', '정현우', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user6@example.com', '강서연', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user7@example.com', '조은비', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user8@example.com', '윤대호', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user9@example.com', '임수진', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user10@example.com', '한지훈', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user11@example.com', '오민지', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user12@example.com', '서준호', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user13@example.com', '신유나', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user14@example.com', '배성민', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
-    ('user15@example.com', '홍다은', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW());
+    ('admin@example.com', '관리자', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_ADMIN', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user1@example.com', '김철수', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user2@example.com', '이영희', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user3@example.com', '박민수', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user4@example.com', '최지영', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user5@example.com', '정현우', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user6@example.com', '강서연', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user7@example.com', '조은비', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user8@example.com', '윤대호', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user9@example.com', '임수진', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user10@example.com', '한지훈', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user11@example.com', '오민지', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user12@example.com', '서준호', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user13@example.com', '신유나', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user14@example.com', '배성민', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW()),
+    ('user15@example.com', '홍다은', '$2a$10$MceMgkmUqTB5wBS76uCJOe09.kmyhR3OJTe4ga6kaUClGUE805y3O', 'ROLE_USER', 'LOCAL', 'ACTIVE', NOW(), NOW());
 
 -- 도서 데이터 (100권)
-INSERT INTO books (title, author, publisher, isbn, category, price, stock_quantity, description, published_at, active, created_at, updated_at)
+INSERT INTO books (title, author, publisher, isbn, category, price, stock_quantity, description, published_at, is_active, created_at, updated_at)
 VALUES
     ('자바의 정석', '남궁성', '도우출판', 'ISBN-0001', 'PROGRAMMING', 30000, 100, '자바 기초부터 실전까지', '2020-01-15', true, NOW(), NOW()),
     ('스프링 인 액션', '크레이그 월즈', '한빛미디어', 'ISBN-0002', 'PROGRAMMING', 40000, 50, '스프링 프레임워크 완벽 가이드', '2021-03-20', true, NOW(), NOW()),
@@ -223,3 +223,41 @@ VALUES
     (54, 13, 5, '크로스 플랫폼 개발의 시작', NOW(), NOW()),
     (55, 14, 4, 'AI 기초를 다지기 좋아요', NOW(), NOW()),
     (60, 15, 5, '데이터 분석 필수 도서입니다', NOW(), NOW());
+
+-- 즐겨찾기(favorites) 데이터 샘플
+INSERT INTO favorites (user_id, book_id, created_at, updated_at)
+VALUES
+    (2, 1, NOW(), NOW()),
+    (3, 2, NOW(), NOW()),
+    (4, 3, NOW(), NOW()),
+    (5, 4, NOW(), NOW()),
+    (6, 5, NOW(), NOW());
+
+-- 장바구니(carts) 데이터 샘플
+INSERT INTO carts (user_id, created_at, updated_at)
+VALUES
+    (2, NOW(), NOW()),
+    (3, NOW(), NOW());
+
+-- 장바구니 항목(cart_items) 데이터 샘플
+INSERT INTO cart_items (cart_id, book_id, quantity, created_at, updated_at)
+VALUES
+    (1, 1, 2, NOW(), NOW()),
+    (1, 2, 1, NOW(), NOW()),
+    (2, 3, 1, NOW(), NOW()),
+    (2, 5, 2, NOW(), NOW()),
+    (2, 10, 1, NOW(), NOW());
+
+-- 주문(orders) 데이터 샘플
+INSERT INTO orders (user_id, status, total_amount, shipping_address, created_at, updated_at)
+VALUES
+    (2, 'PENDING', 70000.00, '서울특별시 강남구 테헤란로 123 101동 101호', NOW(), NOW()),
+    (3, 'DELIVERED', 69000.00, '부산광역시 부산진구 범일로 123', NOW(), NOW());
+
+-- 주문 항목(order_items) 데이터 샘플
+INSERT INTO order_items (order_id, book_id, quantity, unit_price, line_total, created_at, updated_at)
+VALUES
+    (1, 1, 1, 30000.00, 30000.00, NOW(), NOW()),
+    (1, 2, 1, 40000.00, 40000.00, NOW(), NOW()),
+    (2, 3, 1, 36000.00, 36000.00, NOW(), NOW()),
+    (2, 4, 1, 33000.00, 33000.00, NOW(), NOW());

@@ -56,9 +56,9 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
     @PatchMapping("/me/deactivate")
-    public ResponseEntity<ApiResult<Void>> deactivateMe() {
-        userService.deactivateMe();
-        ApiResult<Void> apiResult = ApiResult.successMessage("계정이 비활성화되었습니다.");
+    public ResponseEntity<ApiResult<UserMeResponse>> deactivateMe() {
+        UserMeResponse response = userService.deactivateMe();
+        ApiResult<UserMeResponse> apiResult = ApiResult.success(response, "계정이 비활성화되었습니다.");
         return ResponseEntity.ok(apiResult);
     }
 
@@ -74,6 +74,11 @@ public class UserController {
         ApiResult<Void> apiResult = ApiResult.successMessage("계정이 영구 삭제되었습니다.");
         return ResponseEntity.ok(apiResult);
     }
-
+    @PatchMapping("/me/activate")
+    public ResponseEntity<ApiResult<UserMeResponse>> activateMe() {
+        UserMeResponse response = userService.activateMe();
+        ApiResult<UserMeResponse> apiResult = ApiResult.success(response, "회원 계정이 활성화되었습니다.");
+        return ResponseEntity.ok(apiResult);
+    }
     // 관리자용 /users (목록, 단건) 등이 같이 있다면, /admin/users와 URL 겹치지 않도록 주의
 }

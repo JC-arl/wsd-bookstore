@@ -40,7 +40,7 @@ public class FavoriteService {
     }
 
     @Transactional
-    public void addFavorite(Long bookId) {
+    public FavoriteResponse addFavorite(Long bookId) {
         User user = getCurrentUser();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BusinessException(
@@ -58,15 +58,22 @@ public class FavoriteService {
                 .build();
 
         favoriteRepository.save(favorite);
+        return FavoriteResponse.from(favorite);
     }
 
     @Transactional
-    public void removeFavorite(Long bookId) {
+    public FavoriteResponse removeFavorite(Long bookId) {
         User user = getCurrentUser();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.RESOURCE_NOT_FOUND, "도서를 찾을 수 없습니다."));
 
+        Favorite favorite = favoriteRepository.findByUserAndBook(user, book)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "찜 목록에서 해당 도서를 찾을 수 없습니다."));
+
+        FavoriteResponse response = FavoriteResponse.from(favorite);
         favoriteRepository.deleteByUserAndBook(user, book);
+        return response;
     }
 }

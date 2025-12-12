@@ -105,31 +105,26 @@ public class CartService {
         return CartResponse.from(cart);
     }
     @Transactional
-    public CartResponse updateItemQuantity(Long itemId, int quantity) {
+    public CartResponse updateItemQuantity(Long bookId, int quantity) {
         Long currentUserId = getCurrentUserId();
 
-        CartItem item = cartItemRepository.findById(itemId)
-                .orElseThrow(() ->
-                        new BusinessException(
-                                ErrorCode.RESOURCE_NOT_FOUND,
-                                "장바구니 항목을 찾을 수 없습니다."
-                        )
-                );
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(()->
+                        new BusinessException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
-        // 소유자 검증
-        Cart cart = item.getCart();
-        if (!cart.getUser().getId().equals(currentUserId)) {
-            throw new BusinessException(
-                    ErrorCode.FORBIDDEN,
-                    "본인의 장바구니 항목만 수정할 수 있습니다."
-            );
-        }
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "장바구니를 찾을 수 없습니다."));
 
-        // 수량 변경 (덮어쓰기 방식)
+        // 해당 bookId를 가진 장바구니 항목 찾기
+        CartItem item = cart.getItems().stream()
+                .filter(ci -> ci.getBook().getId().equals(bookId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "장바구니에 해당 도서가 없습니다."));
+        // 수량 변경
         item.setQuantity(quantity);
-        // JPA 영속 상태라면 save()는 생략 가능하지만, 명시적으로 적어도 무방
         cartItemRepository.save(item);
-
         // 변경된 장바구니 전체를 응답
         return toCartResponse(cart);
     }

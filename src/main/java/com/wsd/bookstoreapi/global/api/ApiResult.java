@@ -10,7 +10,7 @@ public class ApiResult<T> {
 
     @JsonProperty("isSuccess")
     @Schema(description = "요청 성공 여부", example = "true")
-    private final boolean isSuccess;
+    private final boolean success;
 
     @Schema(description = "결과 메시지", example = "요청이 성공적으로 처리되었습니다.")
     private final String message;
@@ -21,15 +21,11 @@ public class ApiResult<T> {
     @Schema(description = "실제 응답 데이터(payload)")
     private final T payload;
 
-    public boolean isSuccess() {
-        return isSuccess;
-    }
-
-    private ApiResult(boolean isSuccess,
+    private ApiResult(boolean success,
                       String message,
                       String code,
                       T payload) {
-        this.isSuccess = isSuccess;
+        this.success = success;
         this.message = message;
         this.code = code;
         this.payload = payload;

@@ -34,11 +34,11 @@ public class BookResponse {
     @Schema(description = "가격(원)", example = "30000")
     private BigDecimal price;
 
-    @Schema(description = "도서 요약", example = "자바 개발자라면 반드시 읽어야 할 필독서")
-    private String summary; // or description
+    @Schema(description = "재고", example = "5")
+    private Integer stockQuantity;
 
     @Schema(description = "출간일", example = "2025-12-06")
-    private LocalDate publicationDate;
+    private LocalDate publishedAt;
 
     @Schema(description = "생성 시각", example = "2025-12-06T03:00:00")
     private LocalDateTime createdAt;

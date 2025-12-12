@@ -44,13 +44,13 @@ public class CartController {
                 .status(HttpStatus.CREATED)
                 .body(apiResult);
     }
-    @Operation(summary = "장바구니 항목 수량 변경", description = "특정 장바구니 항목의 수량을 변경합니다.")
-    @PatchMapping("/items/{itemId}")
+    @Operation(summary = "장바구니 항목 수량 변경 (bookId 기준)", description = "도서 ID로 장바구니 항목의 수량을 변경합니다.")
+    @PatchMapping("/items/book/{bookId}")
     public ResponseEntity<ApiResult<CartResponse>> updateItemQuantity(
-            @PathVariable Long itemId,
+            @PathVariable Long bookId,
             @RequestBody @Valid UpdateCartItemRequest request
     ) {
-        CartResponse cart = cartService.updateItemQuantity(itemId, request.getQuantity());
+        CartResponse cart = cartService.updateItemQuantity(bookId, request.getQuantity());
         ApiResult<CartResponse> apiResult = ApiResult.success(cart, "장바구니 항목 수량 변경 성공");
         return ResponseEntity.ok(apiResult);
     }

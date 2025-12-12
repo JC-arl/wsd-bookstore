@@ -157,19 +157,15 @@ public class AuthService {
             );
         }
 
-        // 3) 유저 상태 확인 (비활성 계정 방어)
+        // 3) 유저 존재 확인
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.USER_NOT_FOUND,
                         "사용자를 찾을 수 없습니다."
                 ));
 
-        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
-            throw new BusinessException(
-                    ErrorCode.FORBIDDEN,
-                    "비활성화된 계정입니다."
-            );
-        }
+        // 비활성화된 계정도 재활성화를 위해 토큰 재발급은 허용
+        // 단, 비활성화된 계정은 재활성화 API만 호출 가능
 
         // 4) 새 토큰 발급
         String newAccessToken = jwtTokenProvider.generateAccessToken(userId, email, role);

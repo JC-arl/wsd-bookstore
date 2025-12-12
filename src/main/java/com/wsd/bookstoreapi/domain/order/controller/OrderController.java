@@ -86,9 +86,9 @@ public class OrderController {
             @ApiResponse(responseCode = "409", description = "취소할 수 없는 주문 상태")
     })
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<ApiResult<Void>> cancelMyOrder(@PathVariable Long id) {
-        orderService.cancelMyOrder(id);
-        ApiResult<Void> apiResult = ApiResult.successMessage("주문이 성공적으로 취소되었습니다.");
+    public ResponseEntity<ApiResult<OrderResponse>> cancelMyOrder(@PathVariable Long id) {
+        OrderResponse response = orderService.cancelMyOrder(id);
+        ApiResult<OrderResponse> apiResult = ApiResult.success(response, "주문이 성공적으로 취소되었습니다.");
         return ResponseEntity.ok(apiResult);
     }
 }

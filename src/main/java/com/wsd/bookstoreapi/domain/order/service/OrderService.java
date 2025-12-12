@@ -131,7 +131,7 @@ public class OrderService {
      * 내 주문 취소
      */
     @Transactional
-    public void cancelMyOrder(Long orderId) {
+    public OrderResponse cancelMyOrder(Long orderId) {
         Long userId = SecurityUtil.getCurrentUserId();
 
         Order order = orderRepository.findById(orderId)
@@ -150,6 +150,7 @@ public class OrderService {
         }
 
         order.setStatus(OrderStatus.CANCELED);
+        return OrderResponse.from(order);
     }
 
     /**
