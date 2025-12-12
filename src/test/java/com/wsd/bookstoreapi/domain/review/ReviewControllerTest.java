@@ -173,7 +173,7 @@ class ReviewControllerTest extends IntegrationTestSupport {
                 }
                 """;
 
-        mockMvc.perform(patch("/api/v1/reviews/{id}", review.getId())
+        mockMvc.perform(patch("/api/v1/books/{bookId}/reviews/me", review.getBook().getId())
                         .header("Authorization", "Bearer " + userAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateBody))
@@ -192,7 +192,7 @@ class ReviewControllerTest extends IntegrationTestSupport {
     void deleteReview_success() throws Exception {
         Review review = testDataFactory.createReview(user, book, 4, "삭제 대상 리뷰");
 
-        mockMvc.perform(delete("/api/v1/reviews/{id}", review.getId())
+        mockMvc.perform(delete("/api/v1/books/{bookId}/reviews/me", review.getBook().getId())
                         .header("Authorization", "Bearer " + userAccessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true));

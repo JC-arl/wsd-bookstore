@@ -142,4 +142,55 @@ public class CartService {
         return CartResponse.from(cart);
     }
 
+    /**
+     * 장바구니에서 특정 아이템 삭제 (bookId로)
+     */
+    @Transactional
+    public CartResponse removeItem(Long bookId) {
+        Long currentUserId = getCurrentUserId();
+
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "장바구니를 찾을 수 없습니다."));
+
+        // 해당 bookId를 가진 장바구니 항목 찾기
+        CartItem item = cart.getItems().stream()
+                .filter(ci -> ci.getBook().getId().equals(bookId))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "장바구니에 해당 도서가 없습니다."));
+
+        // 아이템 삭제
+        cart.getItems().remove(item);
+        cartItemRepository.delete(item);
+
+        return toCartResponse(cart);
+    }
+
+    /**
+     * 장바구니 전체 비우기
+     */
+    @Transactional
+    public CartResponse clearCart() {
+        Long currentUserId = getCurrentUserId();
+
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.RESOURCE_NOT_FOUND, "장바구니를 찾을 수 없습니다."));
+
+        // 모든 아이템 삭제
+        cartItemRepository.deleteAll(cart.getItems());
+        cart.getItems().clear();
+
+        return toCartResponse(cart);
+    }
+
 }

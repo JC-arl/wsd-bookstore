@@ -33,10 +33,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.startsWith("/health") ||
+        boolean shouldSkip = path.startsWith("/health") ||
                path.startsWith("/swagger-ui") ||
                path.startsWith("/v3/api-docs") ||
                path.startsWith("/api/v1/auth/");
+
+        if (shouldSkip) {
+            log.debug("JWT Filter skipped for path: {}", path);
+        }
+
+        return shouldSkip;
     }
 
     @Override
@@ -53,8 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                // 1) 블랙리스트 체크
-                if (redisAuthTokenService.isAccessTokenBlacklisted(token)) {
+                // 1) 블랙리스트 체크 (공개 경로는 제외)
+                if (!isPublicPath(requestUri) && redisAuthTokenService.isAccessTokenBlacklisted(token)) {
                     writeUnauthorizedError(response, requestUri,
                             "로그아웃된 토큰입니다.");
                     return; // 더 이상 체인 진행 X
@@ -96,10 +102,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (BusinessException ex) {
+            // 인증이 필요 없는 경로는 토큰 검증 실패해도 통과
+            if (isPublicPath(requestUri)) {
+                log.debug("Token validation failed for public path {}, continuing anyway", requestUri);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             // JWT 관련 BusinessException도 여기서 동일 포맷으로 응답
             int status = ex.getErrorCode().getHttpStatus().value();
             writeErrorResponse(response, requestUri, status, ex.getErrorCode().name(), ex.getMessage());
         } catch (Exception ex) {
+            // 인증이 필요 없는 경로는 토큰 검증 실패해도 통과
+            if (isPublicPath(requestUri)) {
+                log.debug("Token validation failed for public path {}, continuing anyway", requestUri);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             writeErrorResponse(response, requestUri, 401, "UNAUTHORIZED", "유효하지 않은 토큰입니다.");
         }
     }
@@ -155,6 +175,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return path.equals("/api/v1/users/me/activate") ||
                path.startsWith("/api/v1/auth/refresh") ||
                path.equals("/api/v1/users/me");  // 내 정보 조회 (상태 확인용)
+    }
+
+    /**
+     * 인증이 필요 없는 공개 경로인지 확인 (토큰 검증 실패해도 통과)
+     */
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/health") ||
+               path.startsWith("/swagger-ui") ||
+               path.startsWith("/v3/api-docs") ||
+               path.startsWith("/api/v1/auth/login") ||
+               path.startsWith("/api/v1/auth/signup") ||
+               path.startsWith("/api/v1/auth/test-bcrypt");
     }
 
 }

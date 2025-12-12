@@ -164,7 +164,7 @@ class CartControllerTest extends IntegrationTestSupport {
                 }
                 """;
 
-        String responseBody = mockMvc.perform(patch("/api/v1/cart/items/{id}", cartItem.getId())
+        String responseBody = mockMvc.perform(patch("/api/v1/cart/items/book/{bookId}", book.getId())
                         .header("Authorization", "Bearer " + userAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateRequest))

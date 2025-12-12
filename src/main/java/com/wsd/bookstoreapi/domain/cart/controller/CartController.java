@@ -55,4 +55,20 @@ public class CartController {
         return ResponseEntity.ok(apiResult);
     }
 
+    @Operation(summary = "장바구니 아이템 삭제", description = "도서 ID로 장바구니에서 특정 아이템을 삭제합니다.")
+    @DeleteMapping("/items/book/{bookId}")
+    public ResponseEntity<ApiResult<CartResponse>> removeItem(@PathVariable Long bookId) {
+        CartResponse cart = cartService.removeItem(bookId);
+        ApiResult<CartResponse> apiResult = ApiResult.success(cart, "장바구니 아이템이 삭제되었습니다.");
+        return ResponseEntity.ok(apiResult);
+    }
+
+    @Operation(summary = "장바구니 전체 비우기", description = "장바구니의 모든 아이템을 삭제합니다.")
+    @DeleteMapping
+    public ResponseEntity<ApiResult<CartResponse>> clearCart() {
+        CartResponse cart = cartService.clearCart();
+        ApiResult<CartResponse> apiResult = ApiResult.success(cart, "장바구니가 비워졌습니다.");
+        return ResponseEntity.ok(apiResult);
+    }
+
 }
