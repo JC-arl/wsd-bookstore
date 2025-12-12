@@ -104,9 +104,9 @@ public class ReviewController {
             @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음")
     })
     @DeleteMapping("/api/v1/books/{bookId}/reviews/me")
-    public ResponseEntity<ApiResult<Void>> deleteMyReview(@PathVariable Long bookId) {
-        reviewService.deleteMyReview(bookId);
-        ApiResult<Void> apiResult = ApiResult.successMessage("리뷰가 성공적으로 삭제되었습니다.");
+    public ResponseEntity<ApiResult<ReviewResponse>> deleteMyReview(@PathVariable Long bookId) {
+        ReviewResponse response = reviewService.deleteMyReview(bookId);
+        ApiResult<ReviewResponse> apiResult = ApiResult.success(response, "리뷰가 성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(apiResult);
     }
 }

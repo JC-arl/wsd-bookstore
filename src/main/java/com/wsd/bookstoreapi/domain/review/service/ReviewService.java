@@ -114,7 +114,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteMyReview(Long bookId) {
+    public ReviewResponse deleteMyReview(Long bookId) {
         User user = getCurrentUser();
 
         Book book = bookRepository.findById(bookId)
@@ -126,7 +126,9 @@ public class ReviewService {
                         ErrorCode.RESOURCE_NOT_FOUND,
                         "해당 도서에 대한 리뷰를 찾을 수 없습니다."));
 
+        ReviewResponse response = ReviewResponse.from(review);
         reviewRepository.delete(review);
+        return response;
     }
 
     @Transactional(readOnly = true)

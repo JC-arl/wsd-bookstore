@@ -1,5 +1,7 @@
 package com.wsd.bookstoreapi.global.security.jwt;
 
+import com.wsd.bookstoreapi.domain.user.entity.User;
+import com.wsd.bookstoreapi.domain.user.repository.UserRepository;
 import com.wsd.bookstoreapi.global.security.UserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisAuthTokenService redisAuthTokenService;
+    private final UserRepository userRepository;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -63,6 +66,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long userId = jwtTokenProvider.getUserId(token);
                 String role = jwtTokenProvider.getRole(token);
                 String email = jwtTokenProvider.getEmail(token);
+
+                // 비활성화된 사용자 체크 (특정 경로는 예외 허용)
+                if (!isAllowedPathForInactiveUser(requestUri)) {
+                    User user = userRepository.findById(userId).orElse(null);
+                    if (user != null && "INACTIVE".equalsIgnoreCase(user.getStatus())) {
+                        writeUnauthorizedError(response, requestUri,
+                                "비활성화된 계정입니다. 계정을 활성화한 후 이용해주세요.");
+                        return;
+                    }
+                }
 
                 UserPrincipal principal = new UserPrincipal(userId, email, role);
 
@@ -135,5 +148,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return authHeader.substring(7);
     }
 
+    /**
+     * 비활성화된 사용자도 접근 가능한 경로인지 확인
+     */
+    private boolean isAllowedPathForInactiveUser(String path) {
+        return path.equals("/api/v1/users/me/activate") ||
+               path.startsWith("/api/v1/auth/refresh") ||
+               path.equals("/api/v1/users/me");  // 내 정보 조회 (상태 확인용)
+    }
 
 }
