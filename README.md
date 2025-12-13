@@ -430,8 +430,8 @@ open build/reports/tests/test/index.html
 ## 문서
 
 ### API 문서
-- **[Swagger UI (Local)] (http://localhost:8080/swagger-ui/index.html)**: `http://localhost:8080/swagger-ui/index.html`
-- [Swagger UI (Production)] (http://113.198.66.68:10088/swagger-ui/index.html) : `http://113.198.66.68:10088/swagger-ui/index.html`
+- **[Swagger UI (Local)](http://localhost:8080/swagger-ui/index.html)**: `http://localhost:8080/swagger-ui/index.html`
+- **[Swagger UI (Production)](http://113.198.66.68:10088/swagger-ui/index.html)**: `http://113.198.66.68:10088/swagger-ui/index.html`
 - **API 설계**: [docs/api-design.md](docs/api-design.md)
 
 ### 기술 문서
