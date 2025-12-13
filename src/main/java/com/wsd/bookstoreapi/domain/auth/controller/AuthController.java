@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,10 +34,66 @@ public class AuthController {
 
     @Operation(summary = "회원가입", description = "새로운 사용자 계정을 생성합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "회원가입 성공"),
-            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 데이터"),
-            @ApiResponse(responseCode = "409", description = "중복된 이메일"),
-            @ApiResponse(responseCode = "422", description = "요청 형식 오류")
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "회원가입 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "message": "회원가입이 완료되었습니다.",
+                                      "code": null,
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "유효하지 않은 요청 데이터",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "입력값 검증에 실패했습니다.",
+                                      "code": "VALIDATION_FAILED",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "중복된 이메일",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "이미 존재하는 리소스입니다.",
+                                      "code": "DUPLICATE_RESOURCE",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "요청 형식 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "처리할 수 없는 요청입니다.",
+                                      "code": "UNPROCESSABLE_ENTITY",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            )
     })
     @PostMapping("/signup")
     public ResponseEntity<ApiResult<Void>> signUp(@Valid @RequestBody SignUpRequest request) {
@@ -46,9 +104,55 @@ public class AuthController {
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 Access/Refresh Token을 발급합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공"),
-            @ApiResponse(responseCode = "401", description = "이메일 또는 비밀번호 불일치"),
-            @ApiResponse(responseCode = "422", description = "요청 형식 오류")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "로그인 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "message": "로그인에 성공했습니다.",
+                                      "code": null,
+                                      "payload": {
+                                        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIn0.abc123",
+                                        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIn0.def456",
+                                        "tokenType": "Bearer"
+                                      }
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "이메일 또는 비밀번호 불일치",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "이메일 또는 비밀번호가 일치하지 않습니다.",
+                                      "code": "UNAUTHORIZED",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "요청 형식 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "처리할 수 없는 요청입니다.",
+                                      "code": "UNPROCESSABLE_ENTITY",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            )
     })
     @PostMapping("/login")
     public ResponseEntity<ApiResult<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
@@ -63,9 +167,55 @@ public class AuthController {
 
     @Operation(summary = "토큰 재발급", description = "유효한 Refresh Token으로 Access/Refresh Token을 재발급합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "재발급 성공"),
-            @ApiResponse(responseCode = "401", description = "로그인이 필요하거나 Refresh Token이 유효하지 않음"),
-            @ApiResponse(responseCode = "403", description = "비활성화된 계정"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "재발급 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "message": "토큰이 성공적으로 재발급되었습니다.",
+                                      "code": null,
+                                      "payload": {
+                                        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIn0.new123",
+                                        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIn0.new456",
+                                        "tokenType": "Bearer"
+                                      }
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "로그인이 필요하거나 Refresh Token이 유효하지 않음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "인증이 필요합니다.",
+                                      "code": "UNAUTHORIZED",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "비활성화된 계정",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "접근 권한이 없습니다.",
+                                      "code": "FORBIDDEN",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            )
     })
     @PostMapping("/refresh")
     public ResponseEntity<ApiResult<AuthResponse>> refreshToken(
@@ -82,8 +232,36 @@ public class AuthController {
 
     @Operation(summary = "로그아웃", description = "현재 Access Token을 블랙리스트에 등록하고 Refresh Token을 삭제합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
-            @ApiResponse(responseCode = "400", description = "Authorization 헤더 형식 오류")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "로그아웃 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "message": "로그아웃 되었습니다.",
+                                      "code": null,
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Authorization 헤더 형식 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "message": "잘못된 요청입니다.",
+                                      "code": "BAD_REQUEST",
+                                      "payload": null
+                                    }
+                                    """)
+                    )
+            )
     })
     @PostMapping("/logout")
     public ResponseEntity<ApiResult<Void>> logout(HttpServletRequest request) {
