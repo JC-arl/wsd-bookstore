@@ -277,6 +277,10 @@ Headers:
 이메일: user1@example.com ~ user15@example.com
 비밀번호: password123 (모두 동일)
 권한: ROLE_USER
+{
+  "email": "test@example.com",
+  "password": "12345678"
+}
 ```
 
 ## 엔드포인트 목록
@@ -311,6 +315,7 @@ Headers:
   "code": null,
   "payload": {
     // 응답 데이터
+    ...
   }
 }
 ```
