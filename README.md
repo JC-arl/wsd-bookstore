@@ -430,8 +430,8 @@ open build/reports/tests/test/index.html
 ## 문서
 
 ### API 문서
-- **Swagger UI (Local)**: `http://localhost:8080/swagger-ui/index.html`
-- **Swagger UI (Production)**: `http://113.198.66.68:10088/swagger-ui/index.html`
+- **[Swagger UI (Local)] (http://localhost:8080/swagger-ui/index.html)**: `http://localhost:8080/swagger-ui/index.html`
+- [Swagger UI (Production)] (http://113.198.66.68:10088/swagger-ui/index.html) : `http://113.198.66.68:10088/swagger-ui/index.html`
 - **API 설계**: [docs/api-design.md](docs/api-design.md)
 
 ### 기술 문서
@@ -516,10 +516,6 @@ Password: .env 파일에 설정된 값
 6. **모니터링**: Prometheus + Grafana
 7. **로깅**: ELK Stack 구축
 8. **CI/CD**: GitHub Actions 자동 배포
-
-## 라이선스
-
-This project is licensed under the MIT License.
 
 ## 문의
 
