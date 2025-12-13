@@ -523,4 +523,4 @@ This project is licensed under the MIT License.
 
 ## 문의
 
-프로젝트 관련 문의사항은 [Issues](https://github.com/your-username/bookstore-api/issues)에 등록해주세요.
+프로젝트 관련 문의사항은 [Issues](https://github.com/JC-arl/bookstore-api/issues)에 등록해주세요.
